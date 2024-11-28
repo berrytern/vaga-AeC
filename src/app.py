@@ -28,12 +28,13 @@ app.add_middleware(
 app.include_router(AUTH_ROUTER, prefix="/auth", tags=["auth"])
 
 
+# This is a context manager that will run before the app starts
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from asyncio import sleep
 
     try_count, retry = 0, 5
-
+    # Try to initialize the models
     while True:
         try:
             await init_models()
@@ -43,6 +44,7 @@ async def lifespan(app: FastAPI):
                 break
             try_count += 1
             await sleep(try_count**2)
+    # Create the admin user if it does not exist
     async with get_db() as session:
         repo = AuthRepository(session)
         print("on admin creation", flush=True)
@@ -60,4 +62,5 @@ async def lifespan(app: FastAPI):
     yield
 
 
+# Set the lifespan context
 app.router.lifespan_context = lifespan
