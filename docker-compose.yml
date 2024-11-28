@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    container_name: aec-back
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      - EMAIL_LOGIN=${EMAIL_LOGIN}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAILS_DEV_TEAM=${EMAILS_DEV_TEAM}
+      - POSTGRE_URL=${POSTGRE_URL}
+      - SSL_ENABLE=${SSL_ENABLE}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./.certs/aec-back/:/etc/.certs/:ro
+    ports:
+      - "8000:8000"
+    networks:
+      - aec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: aec-db
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+
+volumes:
+  postgres_data:
+
+networks:
+  aec-network:
+    name: aec-network
+    driver: bridge
