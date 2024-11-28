@@ -8,6 +8,8 @@ services:
     restart: always
     environment:
       - PORT_HTTP=${PORT_HTTP}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - EMAIL_LOGIN=${EMAIL_LOGIN}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - EMAILS_DEV_TEAM=${EMAILS_DEV_TEAM}
