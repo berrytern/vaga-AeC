@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, DateTime
-from sqlalchemy.dialects.postgresql import UUID, TEXT, INTEGER
+from sqlalchemy.dialects.postgresql import UUID, TEXT, DOUBLE_PRECISION
 from sqlalchemy.sql import func
 
 from . import Base
@@ -13,7 +13,7 @@ class Book(Base):
     title = Column(String(60), nullable=False)
     description = Column(TEXT, nullable=False)
     author = Column(String(60), nullable=False)
-    year_of_release = Column(INTEGER, nullable=True)
+    price = Column(DOUBLE_PRECISION, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
