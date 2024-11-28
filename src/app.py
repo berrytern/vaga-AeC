@@ -49,16 +49,23 @@ async def lifespan(app: FastAPI):
         repo = AuthRepository(session)
         print("on admin creation", flush=True)
         if not await repo.get_one_by_username(settings.ADMIN_USERNAME):
-            password = bcrypt.hashpw(
-                settings.ADMIN_PASSWORD.encode(), bcrypt.gensalt(13)
-            ).decode()
-            await repo.create(
-                {
-                    "username": settings.ADMIN_USERNAME,
-                    "password": password,
-                    "user_type": UserTypes.ADMIN.value,
-                }
-            )
+            try:
+                password = bcrypt.hashpw(
+                    settings.ADMIN_PASSWORD.encode(), bcrypt.gensalt(13)
+                ).decode()
+                await repo.create(
+                    {
+                        "username": settings.ADMIN_USERNAME,
+                        "password": password,
+                        "user_type": UserTypes.ADMIN.value,
+                    }
+                )
+            except BaseException as err:
+                print(
+                    f"An Error occourred while creating the admin user: {err}",
+                    flush=True,
+                )
+
     yield
 
 
