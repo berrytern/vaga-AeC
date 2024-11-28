@@ -37,9 +37,9 @@ string_mask         = utf8only
 countryName                    = BR
 stateOrProvinceName            = PB
 localityName                   = João Pessoa
-organizationName               = YAITEC
-organizationalUnitName         = YAITEC
-commonName                     = YAITEC CA
+organizationName               = AEC
+organizationalUnitName         = AEC
+commonName                     = AEC CA
 
 ####################################################################
 [ ca_extensions ]
@@ -92,7 +92,7 @@ EOF
 openssl req -x509 \
   -config "$DIR/openssl.cnf" \
   -nodes -days 3650 \
-  -subj "/O=YAITEC,CN=YAITEC CA" \
+  -subj "/O=AEC,CN=AEC CA" \
   -keyout "$DIR/ca.key" \
   -out "$DIR/ca.pem" 2>/dev/null
 
@@ -127,7 +127,7 @@ generateCerts() {
   openssl req \
     -new -nodes \
     -key "$5/$4_key.pem" \
-    -subj "/O=$ORG/CN=YAITEC" \
+    -subj "/O=$ORG/CN=AEC" \
     -out "$5/$4.csr" 2>/dev/null
 
   # Sign the CSR with our CA. This will generate a new certificate that is signed
