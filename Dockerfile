@@ -5,8 +5,9 @@ RUN apt-get update && \
     apt-get install -y build-essential curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Install Poetry and add to PATH
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    ln -s /root/.local/bin/poetry /usr/local/bin/poetry
 
 # Configure Poetry
 RUN poetry config virtualenvs.create false
