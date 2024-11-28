@@ -16,6 +16,16 @@ class Client(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self) -> str:
-        return '{"id": "' + str(self.id) + '", "name": "' + str(self.name) \
-            +'", "email": "' + str(self.email) + '", "created_at": "' \
-            + str(self.created_at) +'", "updated_at": "' + str(self.updated_at)+ '"}'
+        return (
+            '{"id": "'
+            + str(self.id)
+            + '", "name": "'
+            + str(self.name)
+            + '", "email": "'
+            + str(self.email)
+            + '", "created_at": "'
+            + str(self.created_at)
+            + '", "updated_at": "'
+            + str(self.updated_at)
+            + '"}'
+        )
