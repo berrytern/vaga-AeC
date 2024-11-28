@@ -1,0 +1,4 @@
+.certs/
+*_env/
+.env
+.env.example
