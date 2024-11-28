@@ -7,6 +7,8 @@ dotenv.load_dotenv()
 
 HTTP_PORT = int(os.getenv("PORT_HTTP", "8000"))
 
+
+ISSUER = os.getenv("ISSUER", "berrytern")
 # Define jwt secret
 JWT_SECRET = os.getenv("JWT_SECRET")
 POSTGRE_URL = os.getenv(
