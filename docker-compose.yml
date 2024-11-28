@@ -7,6 +7,7 @@ services:
       - postgres
     restart: always
     environment:
+      - PORT_HTTP=${PORT_HTTP}
       - EMAIL_LOGIN=${EMAIL_LOGIN}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - EMAILS_DEV_TEAM=${EMAILS_DEV_TEAM}
@@ -16,7 +17,7 @@ services:
     volumes:
       - ./.certs/aec-back/:/etc/.certs/:ro
     ports:
-      - "8000:8000"
+      - ${PORT_HTTP}:${PORT_HTTP}
     networks:
       - aec-network
     logging:
