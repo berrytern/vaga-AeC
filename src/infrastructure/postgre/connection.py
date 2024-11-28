@@ -1,17 +1,18 @@
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from .schema import Base
 from src.utils import settings
 
 
-engine =  create_async_engine(settings.POSTGRE_URL)
+engine = create_async_engine(settings.POSTGRE_URL)
 
-SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
-
+SessionLocal = async_sessionmaker(
+    autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
+)
 
 
 def get_db():
     return SessionLocal()
+
 
 async def init_models():
     async with engine.begin() as conn:
