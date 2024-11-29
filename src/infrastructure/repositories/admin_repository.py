@@ -34,18 +34,23 @@ class AdminRepository:
             await self.session.commit()
         return result
 
-    async def get_one(self, id):
-        get_one_stmt = select(Admin).where(Admin.id == id).limit(1)
+    async def get_one(self, fields: Dict[str, Any]):
+        get_one_stmt = select(Admin)
+        for key, value in fields.items():
+            get_one_stmt = get_one_stmt.where(
+                Admin.__getattribute__(Admin, key) == value
+            )
+        get_one_stmt = get_one_stmt.limit(1)
         result = (await self.session.execute(get_one_stmt)).fetchone()
         if result:
-            result = result[0]
+            item: Admin = result[0]
             result = loads(
                 AdminModel(
-                    id=result.id,
-                    name=result.name,
-                    email=result.email,
-                    created_at=result.created_at,
-                    updated_at=result.updated_at,
+                    id=item.id,
+                    name=item.name,
+                    email=item.email,
+                    created_at=item.created_at,
+                    updated_at=item.updated_at,
                 ).model_dump_json()
             )
         return result

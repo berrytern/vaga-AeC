@@ -42,6 +42,7 @@ class QueryModel(BaseModel):
     def sort_conversion(cls, v):
         if isinstance(v, list) and v:
             return v[0]
+        return v
 
     def query_dict(cls):
         temp = cls.model_dump(

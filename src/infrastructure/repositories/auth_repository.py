@@ -23,8 +23,11 @@ class AuthRepository:
             await self.session.commit()
         return result
 
-    async def get_one(self, id):
-        get_one_stmt = select(Auth).where(Auth.id == id).limit(1)
+    async def get_one(self, fields: Dict[str, Any]):
+        get_one_stmt = select(Auth)
+        for key, value in fields.items():
+            get_one_stmt = get_one_stmt.where(Auth.__getattribute__(Auth, key) == value)
+        get_one_stmt = get_one_stmt.limit(1)
         result = (await self.session.execute(get_one_stmt)).fetchone()
         return result
 

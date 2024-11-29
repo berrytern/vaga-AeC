@@ -24,3 +24,13 @@ async def login(data: CredentialModel, response_model=RefreshCredentialModel):
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
+
+
+@AUTH_ROUTER.post("/refresh_token")
+async def refresh_token(
+    data: RefreshCredentialModel, response_model=RefreshCredentialModel
+):
+    response = await AuthController().refresh_token(data)
+    return JSONResponse(
+        content=response[0], status_code=response[1], headers=response[2]
+    )

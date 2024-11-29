@@ -1,4 +1,5 @@
 from .admin_model import CreateAdminModel, AdminModel, AdminList, AdminQueryModel
+from .auth_model import AuthModel
 from .book_model import BookModel, BookList
 from .credential_model import (
     CreateAuthModel,
