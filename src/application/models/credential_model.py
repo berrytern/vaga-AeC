@@ -14,8 +14,32 @@ class CreateAuthModel(BaseModel):
     @field_validator("password")
     @classmethod
     def v_password(cls, value: str) -> str:
+        """
+        Validates if a password meets the security requirements.
+
+        Requirements:
+        - At least 8 characters long
+        - At least one special character
+        - At least one uppercase letter
+        - At least one lowercase letter
+        - At least one number
+
+        Args:
+            password: The password to validate
+
+        Returns:
+            str
+        """
         if re.search(
-            r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#\!])[0-9a-zA-Z$*&@#\!]{8,}$",
+            (
+                r"^(?=.*\d)"  # At least one number
+                r"(?=.*[a-z])"  # At least one lowercase letter
+                r"(?=.*[A-Z])"  # At least one uppercase letter
+                r"(?=.*[\!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?])"  # At least one special character
+                # Only valid characters
+                r"[a-zA-Z0-9áàâãéèêíïóôõöúüçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÜÇÑ\!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]"
+                r"{8,}$"  # at least 8 characters long
+            ),
             value,
         ):
             return value

@@ -21,7 +21,7 @@ class AdminRepository:
             .values(**data)
         )
         result = (await self.session.execute(insert_stmt)).fetchone()
-        if result and commit:
+        if result:
             result = loads(
                 AdminModel(
                     id=result[0],
@@ -31,7 +31,8 @@ class AdminRepository:
                     updated_at=result[4],
                 ).model_dump_json()
             )
-            await self.session.commit()
+            if commit:
+                await self.session.commit()
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
