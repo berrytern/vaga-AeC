@@ -28,7 +28,6 @@ class AuthController:
             if result is None:  # User not found, return unauthorized
                 return response, HTTPStatus.UNAUTHORIZED, {}
             result = result[0]
-            # result = await repo.update_one(aluno_id, aluno.model_dump(exclude_none=True))
             if not bcrypt.checkpw(data.password.encode(), result.password.encode()):
                 return None, HTTPStatus.UNAUTHORIZED, {}
             current = datetime.utcnow()
@@ -47,7 +46,7 @@ class AuthController:
             response = {
                 "access_token": token,
                 "refresh_token": bcrypt.hashpw(
-                    token.encode("utf8"), bcrypt.gensalt(12)
+                    token.encode("utf8"), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
                 ).decode("utf8"),
             }
             await repo.update_one(
