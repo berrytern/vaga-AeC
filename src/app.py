@@ -1,5 +1,6 @@
 from src.background.tasks import CreateDefaultAdminTask
 from src.infrastructure.database.connection import init_models
+from src.presenters.exceptions.api_exception_manager import APIExceptionManager
 from src.main.routes import ADMIN_ROUTER, AUTH_ROUTER
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,16 +32,13 @@ app.include_router(ADMIN_ROUTER, prefix="/admins", tags=["auth"])
 async def lifespan(app: FastAPI):
     from asyncio import sleep
 
-    try_count, retry = 0, 5
+    retry = 5
     # Try to initialize the models
-    while True:
+    for try_count in range(1, retry + 1):
         try:
             await init_models()
             break
         except BaseException:
-            if try_count >= retry:
-                break
-            try_count += 1
             await sleep(try_count**2)
     # Create the admin user if it does not exist
     await CreateDefaultAdminTask.run()
@@ -49,3 +47,6 @@ async def lifespan(app: FastAPI):
 
 # Set the lifespan context
 app.router.lifespan_context = lifespan
+
+# Register the error handling
+APIExceptionManager.register_error_handling(app)

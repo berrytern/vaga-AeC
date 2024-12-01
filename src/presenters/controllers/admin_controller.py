@@ -7,6 +7,7 @@ from src.application.models import (
 from src.application.utils import UserTypes
 from src.infrastructure.database import get_db
 from src.infrastructure.repositories import AuthRepository, AdminRepository
+from src.presenters.exceptions import ConflictException
 import bcrypt
 
 
@@ -43,13 +44,9 @@ class AdminController:
                 return result, 201, {}
             except BaseException:
                 await session.rollback()
-                return (
-                    {
-                        "message": "Already exist",
-                        "description": "email/username already used",
-                    },
-                    409,
-                    {},
+                raise ConflictException(
+                    "Already exist",
+                    "email/username already used",
                 )
 
     async def get_one(self, admin_id: str):
