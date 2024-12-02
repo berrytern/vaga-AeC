@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, Date
+from sqlalchemy import Column, String, DateTime, Date, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from . import Base
@@ -12,6 +12,7 @@ class ReaderSchema(Base):
     name = Column(String(60))
     email = Column(String, unique=True)
     birthday = Column(Date)
+    books_read_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -25,6 +26,8 @@ class ReaderSchema(Base):
             + str(self.email)
             + '", "birthday": "'
             + str(self.birthday)
+            + '", "books_read_count": "'
+            + str(self.books_read_count)
             + '", "created_at": "'
             + str(self.created_at)
             + '", "updated_at": "'
