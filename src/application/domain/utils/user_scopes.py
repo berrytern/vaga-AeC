@@ -7,11 +7,16 @@ class UserScopes(Enum):
         "ad:c",
         "ad:ra",
         "ad:r",
-        "ad:u",
-        "cl:c",
-        "cl:ra",
-        "cl:r",
-        "cl:u",
-        "cl:d",  # Admin
+        "ad:u",  # Admin
+        "rd:c",
+        "rd:ra",
+        "rd:r",
+        "rd:u",
+        "rd:d",
     ]
-    CLIENT: List[str] = []  # Client
+    READER: List[str] = [
+        "rd:ra",
+        "rd:r",
+        "rd:u",
+        "rd:d",
+    ]  # Reader
