@@ -12,21 +12,29 @@ class AuthRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, data: Dict[str, Any], commit=True):
+    async def create(self, data: Dict[str, Any]):
         insert_stmt = (
             AuthSchema.__table__.insert()
             .returning(
                 AuthSchema.id,
                 AuthSchema.username,
-                AuthSchema.foreign_id,
                 AuthSchema.user_type,
                 AuthSchema.last_login,
+                AuthSchema.foreign_id,
             )
             .values(**data)
         )
         result = (await self.session.execute(insert_stmt)).fetchone()
-        if result and commit:
-            await self.session.commit()
+        if result:
+            result = loads(
+                AuthModel(
+                    id=result[0],
+                    username=result[1],
+                    user_type=result[2],
+                    last_login=result[3],
+                    foreign_id=result[4],
+                ).model_dump_json(exclude_none=True)
+            )
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
@@ -87,9 +95,7 @@ class AuthRepository:
                     foreign_id=result.foreign_id,
                 ).model_dump_json()
             )
-            await self.session.commit()
         return result
 
     async def delete_one(self, id):
         await self.session.execute(delete(AuthSchema).where(AuthSchema.id == id))
-        await self.session.commit()

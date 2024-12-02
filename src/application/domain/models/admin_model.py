@@ -1,4 +1,4 @@
-from typing import Optional, List, Union
+from typing import Optional, Union, List
 from .credential_model import CreateAuthModel
 from .query_model import QueryModel
 from src.application.domain.utils import TypeOpStr

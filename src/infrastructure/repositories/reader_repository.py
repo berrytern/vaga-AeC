@@ -12,7 +12,7 @@ class ReaderRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, data: Dict[str, Any], commit=True):
+    async def create(self, data: Dict[str, Any]):
         insert_stmt = (
             ReaderSchema.__table__.insert()
             .returning(
@@ -39,8 +39,6 @@ class ReaderRepository:
                     updated_at=result[6],
                 ).model_dump_json()
             )
-            if commit:
-                await self.session.commit()
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
@@ -100,9 +98,7 @@ class ReaderRepository:
                     updated_at=result[6],
                 ).model_dump_json()
             )
-            await self.session.commit()
         return result
 
     async def delete_one(self, id):
         await self.session.execute(delete(ReaderSchema).where(ReaderSchema.id == id))
-        await self.session.commit()

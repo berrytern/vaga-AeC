@@ -12,7 +12,7 @@ class AdminRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, data: Dict[str, Any], commit=True):
+    async def create(self, data: Dict[str, Any]):
         insert_stmt = (
             AdminSchema.__table__.insert()
             .returning(
@@ -35,8 +35,6 @@ class AdminRepository:
                     updated_at=result[4],
                 ).model_dump_json()
             )
-            if commit:
-                await self.session.commit()
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
@@ -89,9 +87,7 @@ class AdminRepository:
                     updated_at=result[4],
                 ).model_dump_json()
             )
-            await self.session.commit()
         return result
 
     async def delete_one(self, id):
         await self.session.execute(delete(AdminSchema).where(AdminSchema.id == id))
-        await self.session.commit()

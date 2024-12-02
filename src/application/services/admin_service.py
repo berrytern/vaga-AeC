@@ -21,9 +21,8 @@ class AdminService:
         result = await self.repository.create(
             admin.model_dump(
                 exclude_none=True,
-                exclude={"id", "password"},
-            ),
-            commit=False,
+                exclude={"id", "username", "password"},
+            )
         )
         admin.password = bcrypt.hashpw(
             admin.password.encode(), bcrypt.gensalt(13)
@@ -40,9 +39,7 @@ class AdminService:
             }
         )
 
-        return await self.auth_repository.create(
-            auth.model_dump(exclude_none=True), True
-        )
+        return await self.auth_repository.create(auth.model_dump(exclude_none=True))
 
     async def get_one(self, admin_id: str):
         return await self.repository.get_one({"id": admin_id})

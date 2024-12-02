@@ -27,7 +27,6 @@ class AuthService:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
-        print(result, result["password"], type(result["password"]), flush=True)
         if not bcrypt.checkpw(data.password.encode(), result["password"].encode()):
             return None, HTTPStatus.UNAUTHORIZED, {}
         current = datetime.utcnow()
@@ -64,7 +63,6 @@ class AuthService:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
-        user = result[0]
         current = datetime.utcnow()
         _ = jwt.decode(
             data.access_token.encode("utf8"),
@@ -81,11 +79,11 @@ class AuthService:
 
         token = jwt.encode(
             {
-                "sub": str(user.id),
+                "sub": str(result["id"]),
                 "iss": settings.ISSUER,
-                "type": user.user_type,
+                "type": result["user_type"],
                 "iat": current,
-                "scope": str(self._getScopeByUserType(user.user_type)),
+                "scope": str(self._getScopeByUserType(result["user_type"])),
                 "exp": current + timedelta(seconds=default.REFRESH_TOKEN_EXP_TIME),
             },
             settings.JWT_SECRET,

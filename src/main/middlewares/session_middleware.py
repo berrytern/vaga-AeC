@@ -35,6 +35,9 @@ def session_middleware(next: Callable):
             Callable: The wrapped function  with database session access.
         """
         request.state.db_session = get_db()
-        return await next(*args, request=request, **kwargs)
+        response = await next(*args, request=request, **kwargs)
+        # commit changes if no errors
+        await request.state.db_session.commit()
+        return response
 
     return wrapper

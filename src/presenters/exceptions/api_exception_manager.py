@@ -7,11 +7,13 @@ from sqlalchemy.exc import IntegrityError
 from http import HTTPStatus
 
 
+# It does the rollback of the database session if erros occur
 async def session_rollback(request: Request):
     if hasattr(request.state, "db_session"):
         await request.state.db_session.rollback()
 
 
+# Handles all the exceptions that can occur in the API
 class APIExceptionManager:
     @staticmethod
     def register_error_handling(app: FastAPI):
