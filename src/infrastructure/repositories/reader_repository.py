@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Type, Dict, Any
 from src.infrastructure.database.schemas import ReaderSchema
 from src.application.domain.models import ReaderModel, ReaderList
 from sqlalchemy.ext.asyncio import (
@@ -9,27 +9,36 @@ from json import loads
 
 
 class ReaderRepository:
-    def __init__(self, session: AsyncSession):
+    def __init__(
+        self,
+        session: AsyncSession,
+        schema: Type[ReaderSchema],
+        model: Type[ReaderModel],
+        list_model: Type[ReaderList],
+    ):
         self.session = session
+        self.schema = schema
+        self.model = model
+        self.list_model = list_model
 
     async def create(self, data: Dict[str, Any]):
         insert_stmt = (
-            ReaderSchema.__table__.insert()
+            self.schema.__table__.insert()
             .returning(
-                ReaderSchema.id,
-                ReaderSchema.name,
-                ReaderSchema.email,
-                ReaderSchema.birthday,
-                ReaderSchema.books_read_count,
-                ReaderSchema.created_at,
-                ReaderSchema.updated_at,
+                self.schema.id,
+                self.schema.name,
+                self.schema.email,
+                self.schema.birthday,
+                self.schema.books_read_count,
+                self.schema.created_at,
+                self.schema.updated_at,
             )
             .values(**data)
         )
         result = (await self.session.execute(insert_stmt)).fetchone()
         if result:
             result = loads(
-                ReaderModel(
+                self.model(
                     id=result[0],
                     name=result[1],
                     email=result[2],
@@ -42,17 +51,17 @@ class ReaderRepository:
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
-        get_one_stmt = select(ReaderSchema)
+        get_one_stmt = select(self.schema)
         for key, value in fields.items():
             get_one_stmt = get_one_stmt.where(
-                ReaderSchema.__getattribute__(ReaderSchema, key) == value
+                self.schema.__getattribute__(self.schema, key) == value
             )
         get_one_stmt = get_one_stmt.limit(1)
         result = (await self.session.execute(get_one_stmt)).fetchone()
         if result:
             item: ReaderSchema = result[0]
             result = loads(
-                ReaderModel(
+                self.model(
                     id=item.id,
                     name=item.name,
                     email=item.email,
@@ -65,30 +74,30 @@ class ReaderRepository:
         return result
 
     async def get_all(self, filters={}):
-        stmt = (
-            select(ReaderSchema).filter_by(**filters["query"]).limit(filters["limit"])
+        stmt = select(self.schema).filter_by(**filters["query"]).limit(filters["limit"])
+        stream = await self.session.stream_scalars(stmt.order_by(self.schema.id))
+        return loads(
+            self.list_model(root=[item async for item in stream]).model_dump_json()
         )
-        stream = await self.session.stream_scalars(stmt.order_by(ReaderSchema.id))
-        return loads(ReaderList(root=[item async for item in stream]).model_dump_json())
 
     async def update_one(self, id, data):
         update_stmt = (
-            ReaderSchema.__table__.update()
+            self.schema.__table__.update()
             .returning(
-                ReaderSchema.id,
-                ReaderSchema.name,
-                ReaderSchema.email,
-                ReaderSchema.birthday,
-                ReaderSchema.created_at,
-                ReaderSchema.updated_at,
+                self.schema.id,
+                self.schema.name,
+                self.schema.email,
+                self.schema.birthday,
+                self.schema.created_at,
+                self.schema.updated_at,
             )
-            .where(ReaderSchema.id == id)
+            .where(self.schema.id == id)
             .values(**data)
         )
         result = (await self.session.execute(update_stmt)).fetchone()
         if result:
             result = loads(
-                ReaderModel(
+                self.model(
                     id=result[0],
                     name=result[1],
                     email=result[2],
@@ -101,4 +110,4 @@ class ReaderRepository:
         return result
 
     async def delete_one(self, id):
-        await self.session.execute(delete(ReaderSchema).where(ReaderSchema.id == id))
+        await self.session.execute(delete(self.schema).where(self.schema.id == id))
