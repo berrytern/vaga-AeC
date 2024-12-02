@@ -47,9 +47,10 @@ def auth_middleware(scope: str):
                 # Remove 'Bearer ' prefix if present
                 if token.startswith("Bearer "):
                     token = token.split(" ")[1]
-
                 # Decode and validate the token
-                payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+                payload = jwt.decode(
+                    token, settings.JWT_SECRET, algorithms=["HS256"], verify=True
+                )
                 if scope not in payload["scope"]:
                     raise HTTPException(
                         status_code=401, detail="Invalid or expired token"
