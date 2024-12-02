@@ -2,7 +2,7 @@ from src.background.tasks import CreateDefaultAdminTask
 from src.infrastructure.database.connection import init_models, get_db
 from src.infrastructure.repositories import AuthRepository
 from src.presenters.exceptions.api_exception_manager import APIExceptionManager
-from src.main.routes import ADMIN_ROUTER, AUTH_ROUTER, READER_ROUTER
+from src.main.routes import ADMIN_ROUTER, AUTH_ROUTER, BOOK_ROUTER, READER_ROUTER
 from src.utils.logger import logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +29,7 @@ app.add_middleware(
 app.include_router(AUTH_ROUTER, prefix="/auth", tags=["auth"])
 app.include_router(ADMIN_ROUTER, prefix="/admins", tags=["admin"])
 app.include_router(READER_ROUTER, prefix="/readers", tags=["reader"])
+app.include_router(BOOK_ROUTER, prefix="/books", tags=["book"])
 
 
 # This is a context manager that will run before the app starts
