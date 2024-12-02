@@ -47,8 +47,10 @@ class AdminService:
     async def get_all(self, query: AdminQueryModel) -> List[Dict[str, Any]]:
         return await self.repository.get_all(query)
 
-    async def update_one(self, admin: AdminModel) -> Optional[Any]:
-        return await self.repository.update_one(id, admin.model_dump(exclude_none=True))
+    async def update_one(self, admin_id: str, admin: AdminModel) -> Optional[Any]:
+        return await self.repository.update_one(
+            admin_id, admin.model_dump(exclude_none=True)
+        )
 
     async def delete_one(self, admin_id: str) -> None:
         await self.repository.delete_one(admin_id)

@@ -66,7 +66,7 @@ async def update_reader_info(
     repository = ReaderRepository(request.state.db_session)
     auth_repository = AuthRepository(request.state.db_session)
     service = ReaderService(repository, auth_repository)
-    response = await ReaderController(service).update_one(reader)
+    response = await ReaderController(service).update_one(reader_id, reader)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

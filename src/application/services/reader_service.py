@@ -45,9 +45,11 @@ class ReaderService:
     async def get_all(self, query: ReaderQueryModel) -> List[Dict[str, Any]]:
         return await self.repository.get_all(query)
 
-    async def update_one(self, reader: UpdateReaderModel) -> Optional[Any]:
+    async def update_one(
+        self, reader_id: str, reader: UpdateReaderModel
+    ) -> Optional[Any]:
         return await self.repository.update_one(
-            id, reader.model_dump(exclude_none=True)
+            reader_id, reader.model_dump(exclude_none=True)
         )
 
     async def delete_one(self, reader_id: str) -> None:

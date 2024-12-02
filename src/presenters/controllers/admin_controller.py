@@ -22,8 +22,8 @@ class AdminController:
         result = await self.service.get_all(query)
         return result, 200, {}
 
-    async def update_one(self, admin: AdminModel):
-        result = await self.service.update_one(admin)
+    async def update_one(self, admin_id: str, admin: AdminModel):
+        result = await self.service.update_one(admin_id, admin)
         return result, 200, {}
 
     async def delete_one(self, admin_id: str):

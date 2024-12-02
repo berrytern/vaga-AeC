@@ -63,7 +63,7 @@ async def update_admin_info(request: Request, admin_id: str, admin: AdminModel):
     repository = AdminRepository(request.state.db_session)
     auth_repository = AuthRepository(request.state.db_session)
     service = AdminService(repository, auth_repository)
-    response = await AdminController(service).update_one(admin)
+    response = await AdminController(service).update_one(admin_id, admin)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
