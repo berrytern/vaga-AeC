@@ -1,7 +1,9 @@
 from src.background.tasks import CreateDefaultAdminTask
-from src.infrastructure.database.connection import init_models
+from src.infrastructure.database.connection import init_models, get_db
+from src.infrastructure.repositories import AuthRepository
 from src.presenters.exceptions.api_exception_manager import APIExceptionManager
 from src.main.routes import ADMIN_ROUTER, AUTH_ROUTER
+from src.utils.logger import logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -41,7 +43,9 @@ async def lifespan(app: FastAPI):
         except BaseException:
             await sleep(try_count**2)
     # Create the admin user if it does not exist
-    await CreateDefaultAdminTask.run()
+    async with get_db() as session:
+        repository = AuthRepository(session)
+        await CreateDefaultAdminTask(repository, logger.background_logger).run()
     yield
 
 
