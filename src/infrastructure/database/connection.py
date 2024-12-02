@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from .schema import Base
 from src.utils import settings
 
@@ -10,7 +10,7 @@ SessionLocal = async_sessionmaker(
 )
 
 
-def get_db():
+def get_db() -> AsyncSession:
     return SessionLocal()
 
 
