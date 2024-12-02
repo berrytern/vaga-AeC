@@ -9,7 +9,7 @@ async def test_session_middleware(request_mock):
     # Create mock session
     db_session_mock = AsyncMock()
 
-    excepted_answer = uuid4()
+    excepted_answer = uuid4()  # Create a random answer
 
     # Create mock for next function
     async def next_mock(*args, **kwargs):

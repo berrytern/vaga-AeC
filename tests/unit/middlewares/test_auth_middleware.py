@@ -126,3 +126,35 @@ async def test_auth_middleware_with_invalid_jwt_secret(request_mock):
         request_mock.headers.get.assert_called_with("Authorization")
         assert exc_info.value.status_code == 401
         assert exc_info.value.detail == "Invalid or expired token"
+
+
+@pytest.mark.asyncio
+async def test_auth_middleware_without_authorization_header(request_mock):
+    scope = "vr:c"
+    jwt_secret = str(uuid4())  # Create a random jwt secret
+    token = None
+    # Setup request mock
+    request_mock.headers.get = MagicMock(return_value=token)
+
+    expected_response = str(uuid4())  # Create a random string
+
+    # Create mock for next function
+    async def next_mock(*args, **kwargs):
+        return expected_response
+
+    with patch(
+        "src.main.middlewares.auth_middleware.settings.JWT_SECRET", jwt_secret
+    ), patch(
+        "src.main.middlewares.auth_middleware.jwt.decode", return_value=token
+    ) as decode_mock:
+        assert callable(auth_middleware)
+        assert callable(auth_middleware(scope))
+        assert callable(auth_middleware(scope)(next_mock))
+        middleware = auth_middleware(scope)(next_mock)
+        with pytest.raises(HTTPException) as exc_info:
+            await middleware(request=request_mock)
+        request_mock.headers.get.assert_called_with("Authorization")
+        decode_mock.assert_not_called()
+        # Test failure cases
+        assert exc_info.value.status_code == 401
+        assert exc_info.value.detail == "Authorization header missing"
