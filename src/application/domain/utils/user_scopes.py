@@ -12,11 +12,15 @@ class UserScopes(Enum):
         "rd:ra",
         "rd:r",
         "rd:u",
-        "rd:d",
+        "rd:d",  # Reader
+        "bk:c",
+        "bk:ra",
+        "bk:r",
+        "bk:u",
+        "bk:d",  # Book
     ]
     READER: List[str] = [
-        "rd:ra",
         "rd:r",
         "rd:u",
-        "rd:d",
-    ]  # Reader
+        "rd:d",  # Reader
+    ]
