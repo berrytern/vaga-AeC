@@ -93,7 +93,7 @@ class Logger:
         # self.database_logger = get_logger("database")
         # self.eventbus_logger = get_logger("eventbus")
         self.api_logger = get_logger("api")
-        # self.routine_logger = get_logger("routine")
+        self.background_logger = get_logger("background")
 
     # def setup_logger(self) -> None:
     #    logging.basicConfig(level=logging.INFO)

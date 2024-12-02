@@ -1,6 +1,7 @@
 from src.application.utils import UserTypes
 from src.infrastructure.database.connection import get_db
 from src.infrastructure.repositories import AuthRepository
+from src.utils.logger import logger
 from src.utils import settings
 import bcrypt
 
@@ -8,13 +9,14 @@ import bcrypt
 class CreateDefaultAdminTask:
     @staticmethod
     async def run():
-        async with get_db() as session:
-            repo = AuthRepository(session)
-            print("on admin creation", flush=True)
-            if not await repo.get_one_by_username(settings.ADMIN_USERNAME):
-                try:
+        logger.background_logger.debug("Create default Administrator task started")
+        try:
+            async with get_db() as session:
+                repo = AuthRepository(session)
+                if not await repo.get_one_by_username(settings.ADMIN_USERNAME):
                     password = bcrypt.hashpw(
-                        settings.ADMIN_PASSWORD.encode(), bcrypt.gensalt(13)
+                        settings.ADMIN_PASSWORD.encode(),
+                        bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS),
                     ).decode()
                     await repo.create(
                         {
@@ -23,8 +25,10 @@ class CreateDefaultAdminTask:
                             "user_type": UserTypes.ADMIN.value,
                         }
                     )
-                except BaseException as err:
-                    print(
-                        f"An Error occourred while creating the admin user: {err}",
-                        flush=True,
+                    logger.background_logger.info(
+                        "Administrator account created successfully"
                     )
+        except BaseException:
+            logger.background_logger.exception(
+                "An Error occourred while creating the admin user"
+            )
