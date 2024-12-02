@@ -5,7 +5,7 @@ from uuid import UUID
 
 
 @pytest.mark.asyncio
-async def test_create_reader(reader_repository, mock_session):
+async def test_create_reader(reader_repository, session_mock):
     # Prepare test data
     input_data = {
         "name": READER_DATA["name"],
@@ -25,7 +25,7 @@ async def test_create_reader(reader_repository, mock_session):
         READER_DATA["created_at"],
         READER_DATA["updated_at"],
     )
-    mock_session.execute.return_value = mock_result
+    session_mock.execute.return_value = mock_result
 
     # Execute the method
     result = await reader_repository.create(input_data)
@@ -34,11 +34,12 @@ async def test_create_reader(reader_repository, mock_session):
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
     assert result["email"] == READER_DATA["email"]
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
+    mock_result.fetchone.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_get_one_reader(reader_repository, mock_session):
+async def test_get_one_reader(reader_repository, session_mock):
     # Prepare test data
     search_fields = {"id": READER_DATA["id"]}
 
@@ -48,7 +49,7 @@ async def test_get_one_reader(reader_repository, mock_session):
     for key, value in READER_DATA.items():
         setattr(mock_schema, key, value)
     mock_result.fetchone.return_value = (mock_schema,)
-    mock_session.execute.return_value = mock_result
+    session_mock.execute.return_value = mock_result
 
     # Execute the method
     result = await reader_repository.get_one(search_fields)
@@ -57,11 +58,11 @@ async def test_get_one_reader(reader_repository, mock_session):
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
     assert result["email"] == READER_DATA["email"]
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_get_all_readers(reader_repository, mock_session):
+async def test_get_all_readers(reader_repository, session_mock):
     # Prepare test data
     filters = {"query": {}, "limit": 10}
 
@@ -73,7 +74,7 @@ async def test_get_all_readers(reader_repository, mock_session):
     async def mock_stream():
         yield mock_schema
 
-    mock_session.stream_scalars.return_value = mock_stream()
+    session_mock.stream_scalars.return_value = mock_stream()
 
     # Execute the method
     result = await reader_repository.get_all(filters)
@@ -83,11 +84,11 @@ async def test_get_all_readers(reader_repository, mock_session):
     assert len(result) == 1
     assert result[0]["id"] == str(READER_DATA["id"])
     assert result[0]["name"] == READER_DATA["name"]
-    mock_session.stream_scalars.assert_called_once()
+    session_mock.stream_scalars.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_update_one_reader(reader_repository, mock_session):
+async def test_update_one_reader(reader_repository, session_mock):
     # Prepare test data
     reader_id = str(READER_DATA["id"])
     update_data = {"name": "Jane Doe"}
@@ -103,7 +104,7 @@ async def test_update_one_reader(reader_repository, mock_session):
         READER_DATA["created_at"],
         READER_DATA["updated_at"],
     )
-    mock_session.execute.return_value = mock_result
+    session_mock.execute.return_value = mock_result
 
     # Execute the method
     result = await reader_repository.update_one(reader_id, update_data)
@@ -111,11 +112,11 @@ async def test_update_one_reader(reader_repository, mock_session):
     # Assertions
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == "Jane Doe"
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_update_books_read_count(reader_repository, mock_session):
+async def test_update_books_read_count(reader_repository, session_mock):
     # Prepare test data
     reader_id = str(READER_DATA["id"])
     count_increment = 1
@@ -132,7 +133,7 @@ async def test_update_books_read_count(reader_repository, mock_session):
         READER_DATA["created_at"],
         READER_DATA["updated_at"],
     )
-    mock_session.execute.return_value = mock_result
+    session_mock.execute.return_value = mock_result
 
     # Execute the method
     result = await reader_repository.update_books_read_count(reader_id, count_increment)
@@ -140,11 +141,11 @@ async def test_update_books_read_count(reader_repository, mock_session):
     # Assertions
     assert result["id"] == str(READER_DATA["id"])
     assert result["books_read_count"] == updated_count
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_delete_one_reader(reader_repository, mock_session):
+async def test_delete_one_reader(reader_repository, session_mock):
     # Prepare test data
     reader_id = str(READER_DATA["id"])
 
@@ -152,22 +153,22 @@ async def test_delete_one_reader(reader_repository, mock_session):
     await reader_repository.delete_one(reader_id)
 
     # Assertions
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_get_one_reader_not_found(reader_repository, mock_session):
+async def test_get_one_reader_not_found(reader_repository, session_mock):
     # Prepare test data
     search_fields = {"id": UUID("12345678-1234-5678-1234-567812345678")}
 
     # Mock the execute result to return None
     mock_result = MagicMock()
     mock_result.fetchone.return_value = None
-    mock_session.execute.return_value = mock_result
+    session_mock.execute.return_value = mock_result
 
     # Execute the method
     result = await reader_repository.get_one(search_fields)
 
     # Assertions
     assert result is None
-    mock_session.execute.assert_called_once()
+    session_mock.execute.assert_called_once()
