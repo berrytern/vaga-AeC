@@ -37,7 +37,8 @@ class ReaderService:
             }
         )
 
-        return await self.auth_repository.create(auth.model_dump(exclude_none=True))
+        await self.auth_repository.create(auth.model_dump(exclude_none=True))
+        return result
 
     async def get_one(self, reader_id: str):
         return await self.repository.get_one({"id": reader_id})

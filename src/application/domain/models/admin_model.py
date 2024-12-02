@@ -19,25 +19,11 @@ from datetime import datetime
 class CreateAdminModel(CreateAuthModel):
     name: StrictStr = Field(..., min_length=10, max_length=60)
     email: EmailStr = Field(..., min_length=10, max_length=250)
-    created_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
-    )
-    updated_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
-    )
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
-        },
-    )
 
-    @field_serializer("id", check_fields=False)
-    def serialize_id(self, id):
-        return str(id)
+class UpdateAdminModel(BaseModel):
+    name: Optional[StrictStr] = Field(None, min_length=10, max_length=60)
+    email: Optional[EmailStr] = Field(None, min_length=10, max_length=250)
 
 
 class AdminModel(BaseModel):

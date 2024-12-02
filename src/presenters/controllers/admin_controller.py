@@ -1,6 +1,6 @@
 from src.application.domain.models import (
     AdminQueryModel,
-    AdminModel,
+    UpdateAdminModel,
     CreateAdminModel,
 )
 from src.application.services import AdminService
@@ -22,7 +22,7 @@ class AdminController:
         result = await self.service.get_all(query)
         return result, 200, {}
 
-    async def update_one(self, admin_id: str, admin: AdminModel):
+    async def update_one(self, admin_id: str, admin: UpdateAdminModel):
         result = await self.service.update_one(admin_id, admin)
         return result, 200, {}
 

@@ -12,7 +12,9 @@ class AdminSchema(Base):
     name = Column(String(60))
     email = Column(String, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
     def __repr__(self) -> str:
         return (

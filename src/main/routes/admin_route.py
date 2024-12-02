@@ -2,6 +2,7 @@ from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 from src.application.domain.models import (
     CreateAdminModel,
+    UpdateAdminModel,
     AdminModel,
     AdminQueryModel,
     AdminList,
@@ -59,7 +60,7 @@ async def get_one_admin(request: Request, admin_id: str):
 @ADMIN_ROUTER.put("/{admin_id}", response_model=AdminModel)
 @auth_middleware("ad:u")
 @session_middleware
-async def update_admin_info(request: Request, admin_id: str, admin: AdminModel):
+async def update_admin_info(request: Request, admin_id: str, admin: UpdateAdminModel):
     repository = AdminRepository(request.state.db_session)
     auth_repository = AuthRepository(request.state.db_session)
     service = AdminService(repository, auth_repository)

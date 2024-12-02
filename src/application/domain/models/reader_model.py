@@ -17,16 +17,9 @@ from datetime import datetime
 
 
 class CreateReaderModel(CreateAuthModel):
-    id: Optional[UUID] = None
     name: StrictStr = Field(..., min_length=10, max_length=60)
     email: EmailStr = Field(..., min_length=10, max_length=250)
     birthday: datetime = Field(..., description="Format: YYYY-MM-DD")
-    created_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
-    )
-    updated_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
-    )
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -37,9 +30,20 @@ class CreateReaderModel(CreateAuthModel):
         },
     )
 
-    @field_serializer("id")
-    def serialize_id(self, id):
-        return str(id)
+
+class UpdateReaderModel(BaseModel):
+    name: Optional[StrictStr] = None
+    email: Optional[EmailStr] = None
+    birthday: Optional[datetime] = None
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        from_attributes=True,
+        json_encoders={
+            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
+        },
+    )
 
 
 class ReaderModel(BaseModel):
@@ -67,12 +71,6 @@ class ReaderModel(BaseModel):
     @field_serializer("id")
     def serialize_id(self, id):
         return str(id)
-
-
-class UpdateReaderModel(BaseModel):
-    name: Optional[StrictStr] = None
-    email: Optional[EmailStr] = None
-    birthday: Optional[datetime] = None
 
 
 class ReaderList(RootModel):

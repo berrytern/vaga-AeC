@@ -66,6 +66,7 @@ class AdminRepository:
     async def update_one(self, id, data):
         update_stmt = (
             AdminSchema.__table__.update()
+            .where(AdminSchema.id == id)
             .returning(
                 AdminSchema.id,
                 AdminSchema.name,
@@ -73,7 +74,6 @@ class AdminRepository:
                 AdminSchema.created_at,
                 AdminSchema.updated_at,
             )
-            .where(AdminSchema.id == id)
             .values(**data)
         )
         result = (await self.session.execute(update_stmt)).fetchone()

@@ -1,4 +1,10 @@
-from .admin_model import CreateAdminModel, AdminModel, AdminList, AdminQueryModel
+from .admin_model import (
+    CreateAdminModel,
+    UpdateAdminModel,
+    AdminModel,
+    AdminList,
+    AdminQueryModel,
+)
 from .auth_model import AuthModel
 from .book_model import (
     CreateBookModel,
@@ -13,6 +19,12 @@ from .credential_model import (
     RefreshCredentialModel,
     ResetCredentialModel,
 )
+from .favorite_model import (
+    CreateFavoriteModel,
+    FavoriteModel,
+    FavoriteList,
+    FavoriteQueryModel,
+)
 from .reader_model import (
     CreateReaderModel,
     UpdateReaderModel,
@@ -23,6 +35,7 @@ from .reader_model import (
 
 __all__ = [
     "CreateAdminModel",
+    "UpdateAdminModel",
     "AdminModel",
     "AdminList",
     "AdminQueryModel",
@@ -36,6 +49,10 @@ __all__ = [
     "CredentialModel",
     "RefreshCredentialModel",
     "ResetCredentialModel",
+    "CreateFavoriteModel",
+    "FavoriteModel",
+    "FavoriteList",
+    "FavoriteQueryModel",
     "CreateReaderModel",
     "UpdateReaderModel",
     "ReaderModel",
