@@ -1,4 +1,4 @@
-from src.application.models import CredentialModel, RefreshCredentialModel
+from src.application.domain.models import CredentialModel, RefreshCredentialModel
 from src.presenters.controllers import AuthController
 from pydantic import BaseModel
 from fastapi import APIRouter

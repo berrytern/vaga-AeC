@@ -1,4 +1,4 @@
-from src.application.models import (
+from src.application.domain.models import (
     AdminQueryModel,
     AdminModel,
     CreateAdminModel,

@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from src.infrastructure.database.schema import Admin
-from src.application.models import AdminModel, AdminList
+from src.application.domain.models import AdminModel, AdminList
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )

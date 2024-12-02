@@ -1,7 +1,7 @@
 from typing import Optional, List, Union
 from .credential_model import CreateAuthModel
 from .query_model import QueryModel
-from src.application.utils import TypeOpStr
+from src.application.domain.utils import TypeOpStr
 from pydantic import (
     BaseModel,
     RootModel,

@@ -1,11 +1,11 @@
 from typing import Optional, Dict, List, Any
-from src.application.models import (
+from src.application.domain.models import (
     AuthModel,
     AdminQueryModel,
     AdminModel,
     CreateAdminModel,
 )
-from src.application.utils import UserTypes
+from src.application.domain.utils import UserTypes
 from src.infrastructure.repositories import AuthRepository, AdminRepository
 import bcrypt
 

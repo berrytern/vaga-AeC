@@ -1,6 +1,6 @@
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
-from src.application.models import (
+from src.application.domain.models import (
     CreateAdminModel,
     AdminModel,
     AdminQueryModel,

@@ -1,5 +1,5 @@
-from src.application.models import CredentialModel, RefreshCredentialModel
-from src.application.utils import UserTypes, UserScopes
+from src.application.domain.models import CredentialModel, RefreshCredentialModel
+from src.application.domain.utils import UserTypes, UserScopes
 from src.infrastructure.database import get_db
 from src.infrastructure.repositories import AuthRepository
 from src.utils import settings, default

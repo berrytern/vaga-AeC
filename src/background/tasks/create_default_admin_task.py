@@ -1,4 +1,4 @@
-from src.application.utils import UserTypes
+from src.application.domain.utils import UserTypes
 from src.infrastructure.database.connection import get_db
 from src.infrastructure.repositories import AuthRepository
 from src.utils.logger import logger
