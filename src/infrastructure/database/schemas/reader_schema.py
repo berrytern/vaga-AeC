@@ -1,19 +1,17 @@
 import uuid
-from sqlalchemy import Column, String, DateTime
-from sqlalchemy.dialects.postgresql import UUID, TEXT, DOUBLE_PRECISION
+from sqlalchemy import Column, String, DateTime, Date
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-
 from . import Base
 
 
-class Book(Base):
-    __tablename__ = "book"
+class ReaderSchema(Base):
+    __tablename__ = "reader"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    title = Column(String(60), nullable=False)
-    description = Column(TEXT, nullable=False)
-    author = Column(String(60), nullable=False)
-    price = Column(DOUBLE_PRECISION, nullable=False)
+    name = Column(String(60))
+    email = Column(String, unique=True)
+    birthday = Column(Date)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -21,12 +19,12 @@ class Book(Base):
         return (
             '{"id": "'
             + str(self.id)
-            + '", "title": "'
-            + str(self.title)
-            + '", "description": "'
-            + str(self.description)
-            + '", "author": "'
-            + str(self.author)
+            + '", "name": "'
+            + str(self.name)
+            + '", "email": "'
+            + str(self.email)
+            + '", "birthday": "'
+            + str(self.birthday)
             + '", "created_at": "'
             + str(self.created_at)
             + '", "updated_at": "'

@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from . import Base
 
 
-class Auth(Base):
+class AuthSchema(Base):
     __tablename__ = "auth"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
