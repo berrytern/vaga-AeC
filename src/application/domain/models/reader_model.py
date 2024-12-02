@@ -13,20 +13,21 @@ from pydantic import (
     StrictStr,
 )
 from uuid import UUID
-from datetime import datetime
+from datetime import date, datetime
 
 
 class CreateReaderModel(CreateAuthModel):
     name: StrictStr = Field(..., min_length=10, max_length=60)
     email: EmailStr = Field(..., min_length=10, max_length=250)
-    birthday: datetime = Field(..., description="Format: YYYY-MM-DD")
+    birthday: date = Field(..., description="Format: YYYY-MM-DD")
 
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         from_attributes=True,
         json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
+            date: lambda dt: dt.strftime("%Y-%m-%d"),
+            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
         },
     )
 
@@ -34,14 +35,15 @@ class CreateReaderModel(CreateAuthModel):
 class UpdateReaderModel(BaseModel):
     name: Optional[StrictStr] = None
     email: Optional[EmailStr] = None
-    birthday: Optional[datetime] = None
+    birthday: Optional[date] = None
 
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         from_attributes=True,
         json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
+            date: lambda dt: dt.strftime("%Y-%m-%d"),
+            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
         },
     )
 
@@ -50,7 +52,7 @@ class ReaderModel(BaseModel):
     id: Optional[UUID] = None
     name: Optional[StrictStr] = None
     email: Optional[EmailStr] = None
-    birthday: Optional[datetime] = None
+    birthday: Optional[date] = None
     books_read_count: Optional[int] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
         default_factory=lambda: datetime.now().replace(microsecond=0)
@@ -64,7 +66,8 @@ class ReaderModel(BaseModel):
         arbitrary_types_allowed=True,
         from_attributes=True,
         json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
+            date: lambda dt: dt.strftime("%Y-%m-%d"),
+            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
         },
     )
 

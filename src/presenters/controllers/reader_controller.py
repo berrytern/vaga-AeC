@@ -1,8 +1,10 @@
+from typing import Tuple, Dict, Any
 from src.application.domain.models import (
     CreateReaderModel,
     UpdateReaderModel,
     ReaderQueryModel,
 )
+from src.application.port import ReaderInterface
 from src.application.services import ReaderService
 
 
@@ -10,7 +12,9 @@ class ReaderController:
     def __init__(self, service: ReaderService):
         self.service = service
 
-    async def create(self, reader: CreateReaderModel):
+    async def create(
+        self, reader: CreateReaderModel
+    ) -> Tuple[ReaderInterface, int, Dict[str, Any]]:
         result = await self.service.create(reader)
         return result, 201, {}
 

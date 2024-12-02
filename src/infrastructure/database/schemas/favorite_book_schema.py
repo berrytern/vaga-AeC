@@ -1,14 +1,17 @@
 import uuid
-from sqlalchemy import Column, ForeignKey, DateTime, event
+from sqlalchemy import Column, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from . import Base
-from .reader_schema import ReaderSchema
 
 
 class FavoriteBookSchema(Base):
     __tablename__ = "favorite_book"
+
+    __table_args__ = (
+        UniqueConstraint("reader_id", "book_id", name="uq_reader_favorite_book"),
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     reader_id = Column(
@@ -40,22 +43,3 @@ class FavoriteBookSchema(Base):
             + str(self.updated_at)
             + '"}'
         )
-
-
-# Event listeners to update books_read_count
-@event.listens_for(FavoriteBookSchema, "after_insert")
-def increment_books_read_count(mapper, connection, target):
-    connection.execute(
-        ReaderSchema.__table__.update()
-        .where(ReaderSchema.id == target.reader_id)
-        .values(books_read_count=ReaderSchema.books_read_count + 1)
-    )
-
-
-@event.listens_for(FavoriteBookSchema, "after_delete")
-def decrement_books_read_count(mapper, connection, target):
-    connection.execute(
-        ReaderSchema.__table__.update()
-        .where(ReaderSchema.id == target.reader_id)
-        .values(books_read_count=ReaderSchema.books_read_count - 1)
-    )

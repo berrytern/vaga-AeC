@@ -8,7 +8,7 @@ from json import loads
 
 class BookRepository:
     def __init__(self, session: AsyncSession):
-        self.session = session
+        self.session = session  # Database session
 
     async def create(self, data: Dict[str, Any]):
         insert_stmt = (

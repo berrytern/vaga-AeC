@@ -6,6 +6,7 @@ from src.application.domain.models import (
     CreateReaderModel,
 )
 from src.application.domain.utils import UserTypes
+from src.application.port import ReaderInterface
 from src.infrastructure.repositories import AuthRepository, ReaderRepository
 import bcrypt
 
@@ -15,7 +16,7 @@ class ReaderService:
         self.repository = repository
         self.auth_repository = auth_repository
 
-    async def create(self, reader: CreateReaderModel) -> Dict[str, Any]:
+    async def create(self, reader: CreateReaderModel) -> ReaderInterface:
         result = await self.repository.create(
             reader.model_dump(
                 exclude_none=True,
