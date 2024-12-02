@@ -42,4 +42,4 @@ jobs:
       run: poetry install --with dev
 
     - name: Run tests
-      run: poetry run pytest --group=dev
+      run:  poetry run pytest --cov=src/ --cov-report=term-missing tests/
