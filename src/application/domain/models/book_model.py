@@ -15,12 +15,30 @@ from uuid import UUID
 from datetime import datetime
 
 
-class BookModel(BaseModel):
-    id: Optional[UUID] = None
+class CreateBookModel(BaseModel):
     title: StrictStr = Field(..., max_length=60)
     description: StrictStr = Field(..., max_length=400)
     author: StrictStr = Field(..., max_length=60)
     price: StrictFloat = Field(..., ge=0)
+
+
+class UpdateBookModel(BaseModel):
+    """Model for updating an existing book"""
+
+    title: Optional[StrictStr] = Field(None, max_length=60)
+    description: Optional[StrictStr] = Field(None, max_length=400)
+    author: Optional[StrictStr] = Field(None, max_length=60)
+    price: Optional[StrictFloat] = Field(None, ge=0)
+
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
+
+
+class BookModel(BaseModel):
+    id: Optional[UUID] = None
+    title: Optional[StrictStr] = Field(None, max_length=60)
+    description: Optional[StrictStr] = Field(None, max_length=400)
+    author: Optional[StrictStr] = Field(None, max_length=60)
+    price: Optional[StrictFloat] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
         default_factory=lambda: datetime.now().replace(microsecond=0)
     )

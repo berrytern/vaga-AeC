@@ -1,6 +1,12 @@
 from .admin_model import CreateAdminModel, AdminModel, AdminList, AdminQueryModel
 from .auth_model import AuthModel
-from .book_model import BookModel, BookList
+from .book_model import (
+    CreateBookModel,
+    UpdateBookModel,
+    BookModel,
+    BookList,
+    BookQueryModel,
+)
 from .credential_model import (
     CreateAuthModel,
     CredentialModel,
@@ -21,8 +27,11 @@ __all__ = [
     "AdminList",
     "AdminQueryModel",
     "AuthModel",
+    "CreateBookModel",
+    "UpdateBookModel",
     "BookModel",
     "BookList",
+    "BookQueryModel",
     "CreateAuthModel",
     "CredentialModel",
     "RefreshCredentialModel",
