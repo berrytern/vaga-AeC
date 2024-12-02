@@ -33,6 +33,7 @@ app.include_router(ADMIN_ROUTER, prefix="/admins", tags=["auth"])
 # This is a context manager that will run before the app starts
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # use Background service layer if it grows in complexity
     from asyncio import sleep
 
     retry = 5

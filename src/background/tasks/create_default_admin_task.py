@@ -1,3 +1,4 @@
+from .base_task import BaseTask
 from src.application.domain.utils import UserTypes
 from src.infrastructure.repositories import AuthRepository
 from src.utils.logger import logger
@@ -6,7 +7,7 @@ from logging import Logger
 import bcrypt
 
 
-class CreateDefaultAdminTask:
+class CreateDefaultAdminTask(BaseTask):
     def __init__(self, repository: AuthRepository, logger: Logger) -> None:
         self.repository = repository
         self.logger = logger
