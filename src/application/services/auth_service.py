@@ -28,7 +28,9 @@ class AuthService:
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
         if not bcrypt.checkpw(data.password.encode(), result["password"].encode()):
-            return None, HTTPStatus.UNAUTHORIZED, {}
+            raise UnauthorizedException(
+                HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
+            )
         current = datetime.utcnow()
         token = jwt.encode(
             {
