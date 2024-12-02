@@ -18,9 +18,15 @@ class UserScopes(Enum):
         "bk:r",
         "bk:u",
         "bk:d",  # Book
+        "bkf:c",
+        "bkf:r",
+        "bkf:d",  # Favorite
     ]
     READER: List[str] = [
         "rd:r",
         "rd:u",
         "rd:d",  # Reader
+        "bkf:c",
+        "bkf:r",
+        "bkf:d",  # Favorite
     ]
