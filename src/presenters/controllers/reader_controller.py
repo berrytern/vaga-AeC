@@ -28,4 +28,4 @@ class ReaderController:
 
     async def delete_one(self, admin_id: str):
         await self.service.delete_one(admin_id)
-        return None, 200, {}
+        return None, 204, {}

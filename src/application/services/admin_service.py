@@ -11,7 +11,9 @@ import bcrypt
 
 
 class AdminService:
-    def __init__(self, repository: AdminRepository, auth_repository: AuthRepository):
+    def __init__(
+        self, repository: AdminRepository, auth_repository: AuthRepository
+    ) -> None:
         self.repository = repository
         self.auth_repository = auth_repository
 

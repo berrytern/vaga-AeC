@@ -1,10 +1,10 @@
 from .custom_exception import CustomHTTPException
+from src.utils.logger import logger
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from asyncpg.exceptions import PostgresError
 from sqlalchemy.exc import IntegrityError
 from http import HTTPStatus
-from src.utils.logger import logger
 
 
 async def session_rollback(request: Request):

@@ -17,6 +17,12 @@ class AuthSchema(Base):
 
     def __repr__(self) -> str:
         return (
-            f"Auth(id={self.id!r}, username={self.username!r}"
-            + f", user_type={self.user_type}, last_login={self.last_login}, foreign_id={self.foreign_id})"
+            '{"id": "' + str(self.id) + '", "username": "' + str(self.username) + '", '
+            '"user_type": "'
+            + str(self.user_type)
+            + '", "last_login: "'
+            + str(self.last_login)
+            + '", "foreign_id": "'
+            + str(self.foreign_id)
+            + '"}'
         )
