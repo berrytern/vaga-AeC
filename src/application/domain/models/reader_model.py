@@ -46,7 +46,8 @@ class ReaderModel(BaseModel):
     id: Optional[UUID] = None
     name: Optional[StrictStr] = None
     email: Optional[EmailStr] = None
-    birthday: datetime
+    birthday: Optional[datetime] = None
+    books_read_count: Optional[int] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
         default_factory=lambda: datetime.now().replace(microsecond=0)
     )
@@ -66,6 +67,12 @@ class ReaderModel(BaseModel):
     @field_serializer("id")
     def serialize_id(self, id):
         return str(id)
+
+
+class UpdateReaderModel(BaseModel):
+    name: Optional[StrictStr] = None
+    email: Optional[EmailStr] = None
+    birthday: Optional[datetime] = None
 
 
 class ReaderList(RootModel):

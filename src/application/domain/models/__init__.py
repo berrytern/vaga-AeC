@@ -7,4 +7,10 @@ from .credential_model import (
     RefreshCredentialModel,
     ResetCredentialModel,
 )
-from .reader_model import CreateReaderModel, ReaderModel, ReaderList, ReaderQueryModel
+from .reader_model import (
+    CreateReaderModel,
+    UpdateReaderModel,
+    ReaderModel,
+    ReaderList,
+    ReaderQueryModel,
+)
