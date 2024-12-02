@@ -8,7 +8,7 @@ from pydantic import (
     ConfigDict,
     Field,
     field_serializer,
-    validator,
+    field_validator,
     EmailStr,
     StrictStr,
 )
@@ -17,7 +17,6 @@ from datetime import datetime
 
 
 class CreateAdminModel(CreateAuthModel):
-    id: Optional[UUID] = None
     name: StrictStr = Field(..., min_length=10, max_length=60)
     email: EmailStr = Field(..., min_length=10, max_length=250)
     created_at: Optional[datetime] = Field(
@@ -36,7 +35,7 @@ class CreateAdminModel(CreateAuthModel):
         },
     )
 
-    @field_serializer("id")
+    @field_serializer("id", check_fields=False)
     def serialize_id(self, id):
         return str(id)
 
@@ -82,7 +81,7 @@ class AdminQueryModel(QueryModel):
 
         return text  # .replace("*", ".*")
 
-    @validator("name", "email")
+    @field_validator("name", "email")
     def Opvalidator(cls, v) -> List[Union[TypeOpStr, str]]:
         return [
             TypeOpStr(index)

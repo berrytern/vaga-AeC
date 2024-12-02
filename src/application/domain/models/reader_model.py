@@ -8,7 +8,7 @@ from pydantic import (
     ConfigDict,
     Field,
     field_serializer,
-    validator,
+    field_validator,
     EmailStr,
     StrictStr,
 )
@@ -92,7 +92,7 @@ class ReaderQueryModel(QueryModel):
 
         return text  # .replace("*", ".*")
 
-    @validator("name", "email")
+    @field_validator("name", "email")
     def str_validator(cls, v) -> List[Union[TypeOpStr, str]]:
         return [
             TypeOpStr(index)
@@ -101,7 +101,7 @@ class ReaderQueryModel(QueryModel):
             for index in v
         ]
 
-    @validator("birthday")
+    @field_validator("birthday")
     def date_validator(cls, v) -> List[Union[TypeOpDate, str]]:
         return [
             TypeOpDate(index)

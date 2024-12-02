@@ -9,7 +9,6 @@ class AuthController:
 
     async def login(self, data: CredentialModel):
         result = await self.service.login(data)
-        print(result, flush=True)
         return result, HTTPStatus.OK, {}
 
     async def refresh_token(self, data: RefreshCredentialModel):
