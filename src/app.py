@@ -32,7 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-# register the track middleware
+# register the track middleware | It can be used to get the graphic of the requests using prometheus + grafana
 register_track_middleware(app)
 
 app.include_router(AUTH_ROUTER, prefix="/auth", tags=["auth"])
