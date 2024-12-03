@@ -7,6 +7,7 @@ REQUEST_COUNT = Counter(
 )
 
 
+# track status codes of requests and it can be used to monitor the health of the application
 async def track_requests(request: Request, call_next):
     response = await call_next(request)
 
