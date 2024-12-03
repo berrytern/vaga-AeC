@@ -21,8 +21,6 @@ SessionLocal = async_sessionmaker(
 # Register event listener for before_commit, it is a temporary approach, the async event listener is not supported yet
 @event.listens_for(Session, "before_commit")
 def my_before_commit(session):
-    print("before commit!", flush=True)
-
     # sync style API use on Session
     # connection = session.connection()
     """print("session.new:", session.new, dir(session), dict(session), flush=True)

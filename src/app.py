@@ -2,6 +2,7 @@ from src.background.tasks import CreateDefaultAdminTask
 from src.infrastructure.database.connection import init_models, get_db
 from src.infrastructure.repositories import AuthRepository
 from src.presenters.exceptions.api_exception_manager import APIExceptionManager
+from src.main.middlewares import register_track_middleware
 from src.main.routes import (
     ADMIN_ROUTER,
     AUTH_ROUTER,
@@ -31,6 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+# register the track middleware
+register_track_middleware(app)
 
 app.include_router(AUTH_ROUTER, prefix="/auth", tags=["auth"])
 app.include_router(ADMIN_ROUTER, prefix="/admins", tags=["admin"])
