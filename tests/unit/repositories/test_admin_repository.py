@@ -1,7 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
-from src.infrastructure.database.schemas import AdminSchema
-from src.application.domain.models import AdminModel, AdminList
+from unittest.mock import Mock, MagicMock
 from src.infrastructure.repositories.admin_repository import AdminRepository
 from tests.unit.mocks.admin_data import ADMIN_DATA
 from uuid import UUID
@@ -9,14 +7,15 @@ from uuid import UUID
 
 @pytest.mark.asyncio
 async def test_repository_initialization(session_mock):
+    schema, model, list_model = Mock(), Mock(), Mock()
     repository = AdminRepository(
-        session=session_mock, schema=AdminSchema, model=AdminModel, list_model=AdminList
+        session=session_mock, schema=schema, model=model, list_model=list_model
     )
 
     assert repository.session == session_mock
-    assert repository.schema == AdminSchema
-    assert repository.model == AdminModel
-    assert repository.list_model == AdminList
+    assert repository.schema == schema
+    assert repository.model == model
+    assert repository.list_model == list_model
 
 
 @pytest.mark.asyncio
@@ -39,6 +38,7 @@ async def test_create_admin(admin_repository, session_mock):
     result = await admin_repository.create(input_data)
 
     # Assertions
+    assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == ADMIN_DATA["name"]
     assert result["email"] == ADMIN_DATA["email"]
@@ -62,6 +62,7 @@ async def test_get_one_admin(admin_repository, session_mock):
     result = await admin_repository.get_one(search_fields)
 
     # Assertions
+    assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == ADMIN_DATA["name"]
     assert result["email"] == ADMIN_DATA["email"]
@@ -115,6 +116,7 @@ async def test_update_one_admin(admin_repository, session_mock):
     result = await admin_repository.update_one(admin_id, update_data)
 
     # Assertions
+    assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == "Updated Admin"
     assert result["email"] == ADMIN_DATA["email"]
@@ -127,9 +129,10 @@ async def test_delete_one_admin(admin_repository, session_mock):
     admin_id = str(ADMIN_DATA["id"])
 
     # Execute the method
-    await admin_repository.delete_one(admin_id)
+    result = await admin_repository.delete_one(admin_id)
 
     # Assertions
+    assert result is None
     session_mock.execute.assert_called_once()
 
 

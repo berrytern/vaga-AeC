@@ -1,7 +1,21 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, Mock, MagicMock
+from src.infrastructure.repositories import ReaderRepository
 from tests.unit.mocks.reader_data import READER_DATA
 from uuid import UUID
+
+
+@pytest.mark.asyncio
+async def test_reader_repository_initialization(session_mock):
+    schema, model, list_model = Mock(), Mock(), Mock()
+    repository = ReaderRepository(
+        session=session_mock, schema=schema, model=model, list_model=list_model
+    )
+
+    assert repository.session == session_mock
+    assert repository.schema == schema
+    assert repository.model == model
+    assert repository.list_model == list_model
 
 
 @pytest.mark.asyncio
@@ -31,6 +45,8 @@ async def test_create_reader(reader_repository, session_mock):
     result = await reader_repository.create(input_data)
 
     # Assertions
+    assert result is not None
+    assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
     assert result["email"] == READER_DATA["email"]
@@ -55,6 +71,8 @@ async def test_get_one_reader(reader_repository, session_mock):
     result = await reader_repository.get_one(search_fields)
 
     # Assertions
+    assert result is not None
+    assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
     assert result["email"] == READER_DATA["email"]
@@ -139,20 +157,25 @@ async def test_update_books_read_count(reader_repository, session_mock):
     result = await reader_repository.update_books_read_count(reader_id, count_increment)
 
     # Assertions
+    assert result is not None
+    assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["books_read_count"] == updated_count
     session_mock.execute.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_delete_one_reader(reader_repository, session_mock):
+async def test_delete_one_reader(
+    reader_repository: ReaderRepository, session_mock: AsyncMock
+):
     # Prepare test data
     reader_id = str(READER_DATA["id"])
 
     # Execute the method
-    await reader_repository.delete_one(reader_id)
+    result = await reader_repository.delete_one(reader_id)
 
     # Assertions
+    assert result is None
     session_mock.execute.assert_called_once()
 
 
