@@ -1,4 +1,10 @@
-from prometheus_client import Counter, generate_latest, REGISTRY
+from prometheus_client import (
+    generate_latest,
+    Counter,
+    CollectorRegistry,
+    multiprocess,
+    CONTENT_TYPE_LATEST,
+)
 from fastapi import Response, Request, FastAPI
 
 
@@ -24,4 +30,7 @@ def register_track_middleware(app: FastAPI):
 
     @app.get("/metrics")
     def metrics():
-        return Response(generate_latest(REGISTRY), media_type="text/plain")
+        registry = CollectorRegistry()
+        multiprocess.MultiProcessCollector(registry)
+        data = generate_latest(registry)
+        return Response(data, media_type=CONTENT_TYPE_LATEST)
