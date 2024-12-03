@@ -2,3 +2,6 @@
 *_env/
 __pycache__/
 .certs/
+logs/*.log
+.coverage
+mult_proc/*.db

@@ -1,0 +1,9 @@
+# Certificate files
+.certs/
+# Virtual environment
+*_env/
+# Environment variables file
+.env
+.env.example
+# Logs files
+logs/*.log
