@@ -1,4 +1,4 @@
-from typing import Type, Dict, Any
+from typing import Dict, Any
 from src.infrastructure.database.schemas import AdminSchema
 from src.application.domain.models import AdminModel, AdminList
 from sqlalchemy.ext.asyncio import (
@@ -12,31 +12,25 @@ class AdminRepository:
     def __init__(
         self,
         session: AsyncSession,
-        schema: Type[AdminSchema],
-        model: Type[AdminModel],
-        list_model: Type[AdminList],
     ):
         self.session = session  # Database session
-        self.schema = schema
-        self.model = model
-        self.list_model = list_model
 
     async def create(self, data: Dict[str, Any]):
         insert_stmt = (
-            self.schema.__table__.insert()
+            AdminSchema.__table__.insert()
             .returning(
-                self.schema.id,
-                self.schema.name,
-                self.schema.email,
-                self.schema.created_at,
-                self.schema.updated_at,
+                AdminSchema.id,
+                AdminSchema.name,
+                AdminSchema.email,
+                AdminSchema.created_at,
+                AdminSchema.updated_at,
             )
             .values(**data)
         )
         result = (await self.session.execute(insert_stmt)).fetchone()
         if result:
             result = loads(
-                self.model(
+                AdminModel(
                     id=result[0],
                     name=result[1],
                     email=result[2],
@@ -47,17 +41,17 @@ class AdminRepository:
         return result
 
     async def get_one(self, fields: Dict[str, Any]):
-        get_one_stmt = select(self.schema)
+        get_one_stmt = select(AdminSchema)
         for key, value in fields.items():
             get_one_stmt = get_one_stmt.where(
-                self.schema.__getattribute__(self.schema, key) == value
+                AdminSchema.__getattribute__(AdminSchema, key) == value
             )
         get_one_stmt = get_one_stmt.limit(1)
         result = (await self.session.execute(get_one_stmt)).fetchone()
         if result:
-            item: self.schema = result[0]
+            item: AdminSchema = result[0]
             result = loads(
-                self.model(
+                AdminModel(
                     id=item.id,
                     name=item.name,
                     email=item.email,
@@ -68,29 +62,27 @@ class AdminRepository:
         return result
 
     async def get_all(self, filters={}):
-        stmt = select(self.schema).filter_by(**filters["query"]).limit(filters["limit"])
-        stream = await self.session.stream_scalars(stmt.order_by(self.schema.id))
-        return loads(
-            self.list_model(root=[item async for item in stream]).model_dump_json()
-        )
+        stmt = select(AdminSchema).filter_by(**filters["query"]).limit(filters["limit"])
+        stream = await self.session.stream_scalars(stmt.order_by(AdminSchema.id))
+        return loads(AdminList(root=[item async for item in stream]).model_dump_json())
 
     async def update_one(self, id, data):
         update_stmt = (
-            self.schema.__table__.update()
-            .where(self.schema.id == id)
+            AdminSchema.__table__.update()
+            .where(AdminSchema.id == id)
             .returning(
-                self.schema.id,
-                self.schema.name,
-                self.schema.email,
-                self.schema.created_at,
-                self.schema.updated_at,
+                AdminSchema.id,
+                AdminSchema.name,
+                AdminSchema.email,
+                AdminSchema.created_at,
+                AdminSchema.updated_at,
             )
             .values(**data)
         )
         result = (await self.session.execute(update_stmt)).fetchone()
         if result:
             result = loads(
-                self.model(
+                AdminModel(
                     id=result[0],
                     name=result[1],
                     email=result[2],
@@ -101,4 +93,4 @@ class AdminRepository:
         return result
 
     async def delete_one(self, id):
-        await self.session.execute(delete(self.schema).where(self.schema.id == id))
+        await self.session.execute(delete(AdminSchema).where(AdminSchema.id == id))
