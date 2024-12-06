@@ -5,6 +5,7 @@ from src.application.domain.models import (
     ReaderList,
 )
 from src.application.services import (
+    AuthService,
     BookService,
     FavoriteService,
     ReaderService,
@@ -20,6 +21,7 @@ from src.infrastructure.repositories import (
     ReaderRepository,
 )
 from src.presenters.controllers import (
+    AuthController,
     BookController,
     ReaderController,
     FavoriteController,
@@ -27,6 +29,12 @@ from src.presenters.controllers import (
 
 
 class DI:
+    @classmethod
+    def auth_controller(cls, db_session) -> AuthController:
+        repository = AuthRepository(db_session)
+        service = AuthService(repository)
+        return AuthController(service)
+
     @classmethod
     def book_controller(cls, db_session) -> BookController:
         repository = BookRepository(db_session)

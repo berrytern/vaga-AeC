@@ -1,7 +1,5 @@
 from src.application.domain.models import CredentialModel, RefreshCredentialModel
-from src.application.services import AuthService
-from src.infrastructure.repositories import AuthRepository
-from src.presenters.controllers import AuthController
+from src.di import DI
 from pydantic import BaseModel
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
@@ -24,9 +22,7 @@ AUTH_ROUTER = APIRouter()
 @AUTH_ROUTER.post("/login", response_model=RefreshCredentialModel)
 @session_middleware
 async def login(request: Request, data: CredentialModel):
-    repository = AuthRepository(request.state.db_session)
-    service = AuthService(repository)
-    response = await AuthController(service).login(data)
+    response = await DI.auth_controller(request.state.db_session).login(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -35,9 +31,7 @@ async def login(request: Request, data: CredentialModel):
 @AUTH_ROUTER.post("/refresh_token", response_model=RefreshCredentialModel)
 @session_middleware
 async def refresh_token(request: Request, data: RefreshCredentialModel):
-    repository = AuthRepository(request.state.db_session)
-    service = AuthService(repository)
-    response = await AuthController(service).refresh_token(data)
+    response = await DI.auth_controller(request.state.db_session).refresh_token(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
