@@ -57,7 +57,7 @@ class FavoriteRepository:
         )
         result = (await self.session.execute(stmt)).fetchone()
         if result:
-            item: self.schema = result[0]
+            item: FavoriteBookSchema = result[0]
             result = loads(
                 FavoriteModel(
                     id=item.id,

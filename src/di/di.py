@@ -1,4 +1,8 @@
 from src.application.domain.models import (
+    AdminModel,
+    AdminList,
+    BookModel,
+    BookList,
     FavoriteModel,
     FavoriteList,
     ReaderModel,
@@ -12,6 +16,8 @@ from src.application.services import (
     ReaderService,
 )
 from src.infrastructure.database.schemas import (
+    AdminSchema,
+    BookSchema,
     FavoriteBookSchema,
     ReaderSchema,
 )
@@ -40,14 +46,14 @@ class DI:
 
     @classmethod
     def admin_controller(cls, db_session) -> AdminController:
-        repository = AdminRepository(db_session)
+        repository = AdminRepository(db_session, AdminSchema, AdminModel, AdminList)
         auth_repository = AuthRepository(db_session)
         service = AdminService(repository, auth_repository)
         return AdminController(service)
 
     @classmethod
     def book_controller(cls, db_session) -> BookController:
-        repository = BookRepository(db_session)
+        repository = BookRepository(db_session, BookSchema, BookModel, BookList)
         service = BookService(repository)
         return BookController(service)
 
