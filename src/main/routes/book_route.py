@@ -7,9 +7,7 @@ from src.application.domain.models import (
     BookQueryModel,
     BookList,
 )
-from src.application.services import BookService
-from src.infrastructure.repositories import BookRepository
-from src.presenters.controllers import BookController
+from src.di import DI
 from src.main.middlewares import auth_middleware, session_middleware
 
 BOOK_ROUTER = APIRouter()
@@ -19,9 +17,7 @@ BOOK_ROUTER = APIRouter()
 @auth_middleware("bk:c")
 @session_middleware
 async def create_new_book(request: Request, book: CreateBookModel):
-    repository = BookRepository(request.state.db_session)
-    service = BookService(repository)
-    response = await BookController(service).create(book)
+    response = await DI.book_controller(request.state.db_session).create(book)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -34,9 +30,7 @@ async def get_all_books(request: Request):
     query_params = dict(request.query_params)
     query = BookQueryModel(**query_params).query_dict()
 
-    repository = BookRepository(request.state.db_session)
-    service = BookService(repository)
-    response = await BookController(service).get_all(query)
+    response = await DI.book_controller(request.state.db_session).get_all(query)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -46,9 +40,7 @@ async def get_all_books(request: Request):
 @auth_middleware("bk:r")
 @session_middleware
 async def get_one_book(request: Request, book_id: str):
-    repository = BookRepository(request.state.db_session)
-    service = BookService(repository)
-    response = await BookController(service).get_one(book_id)
+    response = await DI.book_controller(request.state.db_session).get_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -58,9 +50,9 @@ async def get_one_book(request: Request, book_id: str):
 @auth_middleware("bk:u")
 @session_middleware
 async def update_book_info(request: Request, book_id: str, book: UpdateBookModel):
-    repository = BookRepository(request.state.db_session)
-    service = BookService(repository)
-    response = await BookController(service).update_one(book_id, book)
+    response = await DI.book_controller(request.state.db_session).update_one(
+        book_id, book
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -70,9 +62,7 @@ async def update_book_info(request: Request, book_id: str, book: UpdateBookModel
 @auth_middleware("bk:d")
 @session_middleware
 async def delete_book_info(request: Request, book_id: str):
-    repository = BookRepository(request.state.db_session)
-    service = BookService(repository)
-    response = await BookController(service).delete_one(book_id)
+    response = await DI.book_controller(request.state.db_session).delete_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
