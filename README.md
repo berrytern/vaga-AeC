@@ -9,6 +9,7 @@ A FastAPI-based backend application developed as part of the application process
 - Reader Profile Management
 - Favorite Books System
 - PostgreSQL Database Integration
+- Database Migrations
 - Async Operations
 - Docker Containerization
 
@@ -17,6 +18,7 @@ A FastAPI-based backend application developed as part of the application process
 - Python 3.11+
 - FastAPI
 - SQLAlchemy (Async)
+- Alembic (migrations)
 - PostgreSQL
 - Docker & Docker Compose
 - Pydantic for data validation
