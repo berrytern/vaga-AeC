@@ -46,16 +46,7 @@ app.include_router(BOOK_ROUTER, prefix="/books", tags=["book"])
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # use Background service layer if it grows in complexity
-    from asyncio import sleep
-
-    retry = 5
-    # Try to initialize the models
-    for try_count in range(1, retry + 1):
-        try:
-            await init_models()
-            break
-        except BaseException:
-            await sleep(try_count**2)
+    await init_models()
     # Create the admin user if it does not exist
     async with get_db() as session:
         repository = AuthRepository(session)

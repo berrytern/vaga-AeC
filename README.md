@@ -38,7 +38,7 @@ A FastAPI-based backend application developed as part of the application process
 2. Environment Setup
     - Copy the example environment file:
         ```sh
-        cp .env.example .env
+        cp .env.docker .env
         ```
     - Update the `.env` file with your configurations:
 3. Build and Run with Docker:
