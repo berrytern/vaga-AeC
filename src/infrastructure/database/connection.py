@@ -3,6 +3,7 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session, sessionmaker
 from .schemas import Base
 from src.utils import settings
+from asyncio import sleep
 
 
 engine = create_async_engine(settings.POSTGRE_URL)
@@ -41,6 +42,14 @@ def get_db() -> AsyncSession:
 
 
 async def init_models():
-    async with engine.begin() as conn:
-        # await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+
+    if settings.ENVIRONMENT != "production":
+        async with engine.begin() as conn:
+            retry = 5
+            for try_count in range(1, retry + 1):
+                try:
+                    async with engine.begin() as conn:
+                        await conn.run_sync(Base.metadata.create_all)
+                    break
+                except BaseException:
+                    await sleep(try_count**2)

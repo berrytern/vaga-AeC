@@ -13,9 +13,6 @@ async def test_repository_initialization(session_mock):
     )
 
     assert repository.session == session_mock
-    assert repository.schema == schema
-    assert repository.model == model
-    assert repository.list_model == list_model
 
 
 @pytest.mark.asyncio

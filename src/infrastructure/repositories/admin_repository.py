@@ -55,7 +55,7 @@ class AdminRepository:
         get_one_stmt = get_one_stmt.limit(1)
         result = (await self.session.execute(get_one_stmt)).fetchone()
         if result:
-            item: self.schema = result[0]
+            item: AdminSchema = result[0]
             result = loads(
                 self.model(
                     id=item.id,
