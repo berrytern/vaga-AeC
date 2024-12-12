@@ -20,3 +20,15 @@ groups:
     annotations:
       summary: "Instance {{ $labels.instance }} under high load"
       description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+    
+  - alert: HighErrorRate
+    expr: |
+      sum(rate(http_requests_total{job="aec-backend",status=~"5.."}[5m])) 
+      / 
+      sum(rate(http_requests_total{job="aec-backend"}[5m])) > 0.05
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Taxa de Erros Alta - {{ $labels.instance }}"
+      description: "Taxa de erros > 5% nos últimos 5 minutos"
