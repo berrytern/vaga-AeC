@@ -5,3 +5,5 @@ __pycache__/
 logs/*.log
 .coverage
 mult_proc/*.db
+.history/*
+.env.config.grafana
