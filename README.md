@@ -59,6 +59,7 @@ A FastAPI-based backend application developed as part of the application process
     ```
 4. Verify the installation:
    - API Documentation: http://localhost:8000/docs
+   - API health(grafana): http://localhost:3000/d/monitoring/service-monitoring
 
 ## Project Structure
 ```
