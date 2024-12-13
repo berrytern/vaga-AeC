@@ -24,7 +24,7 @@ PASSWORD_SALT_ROUNDS = int(os.getenv("PASSWORD_SALT_ROUNDS", "12"))
 # Define JWT secret
 JWT_SECRET = os.getenv("JWT_SECRET")
 # Define database URL
-POSTGRE_URL = os.getenv(
-    "POSTGRE_URL",
+POSTGRES_URL = os.getenv(
+    "POSTGRES_URL",
     "postgresql+asyncpg://admin:admin@localhost/aec?prepared_statement_cache_size=500",
 )

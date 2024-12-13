@@ -28,7 +28,7 @@ if config.config_file_name is not None:
 
 
 # Sobrescreve a URL com a mesma usada na sua aplicação
-config.set_main_option("sqlalchemy.url", settings.POSTGRE_URL)
+config.set_main_option("sqlalchemy.url", settings.POSTGRES_URL)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

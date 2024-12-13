@@ -13,15 +13,17 @@ services:
       - EMAIL_LOGIN=${EMAIL_LOGIN}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - EMAILS_DEV_TEAM=${EMAILS_DEV_TEAM}
-      - POSTGRE_URL=${POSTGRE_URL}
+      - POSTGRES_URL=${POSTGRES_URL}
       - SSL_ENABLE=${SSL_ENABLE}
       - JWT_SECRET=${JWT_SECRET}
+      - PROMETHEUS_MULTIPROC_DIR=${PROMETHEUS_MULTIPROC_DIR}
     volumes:
       - ./.certs/aec-back/:/etc/.certs/:ro
     ports:
       - ${PORT_HTTP}:${PORT_HTTP}
     networks:
-      - aec-network
+      - aec-postgres-network
+      - aec-prometheus-network
     logging:
       driver: json-file
       options:
@@ -39,16 +41,99 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - aec-network
+      - aec-postgres-network
     logging:
       driver: json-file
       options:
         max-size: 100m
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./config/prometheus:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.size=20GB'
+      - '--storage.tsdb.retention.time=1y'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+    networks:
+      - aec-prometheus-network
+      - prometheus-internal-network
+      - grafana-prometheus-network
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - ./config/alertmanager/:/etc/alertmanager/
+    networks:
+      - prometheus-internal-network
+    restart: always
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.hostname == ${HOSTNAME}
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    networks:
+      - prometheus-internal-network
+    restart: always
+    deploy:
+      mode: global
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    env_file:
+      - ./.env.config.grafana
+    networks:
+      - grafana-prometheus-network
+    restart: always
+
 volumes:
   postgres_data:
+  prometheus_data:
+  alertmanager_data:
+  grafana_data:
 
 networks:
-  aec-network:
-    name: aec-network
+  aec-prometheus-network:
+    name: aec-prometheus-network
+    driver: bridge
+  prometheus-internal-network:
+    name: prometheus-internal-network
+    driver: bridge
+  aec-postgres-network:
+    name: aec-postgres-network
+    driver: bridge
+  grafana-prometheus-network:
+    name: grafana-prometheus-network
     driver: bridge

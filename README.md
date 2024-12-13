@@ -9,7 +9,7 @@ A FastAPI-based backend application developed as part of the application process
 - Reader Profile Management
 - Favorite Books System
 - PostgreSQL Database Integration
-- Database Migrations
+- Automated Database Migrations with version control
 - Async Operations
 - Docker Containerization
 
@@ -18,7 +18,10 @@ A FastAPI-based backend application developed as part of the application process
 - Python 3.11+
 - FastAPI
 - SQLAlchemy (Async)
-- Alembic (migrations)
+- Alembic (Database Migration Tool)
+  - Version-controlled schema changes
+  - Automatic migration generation
+  - Forward and rollback support
 - PostgreSQL
 - Docker & Docker Compose
 - Pydantic for data validation
@@ -38,17 +41,25 @@ A FastAPI-based backend application developed as part of the application process
    cd vaga-AeC
 
 2. Environment Setup
-    - Copy the example environment file:
-        ```sh
-        cp .env.docker .env
-        ```
-    - Update the `.env` file with your configurations:
+    1. Setup backend service
+        - Copy the example environment file:
+            ```sh
+            cp .env.docker .env
+            ```
+        - Update the `.env` file with your configurations.
+    2. Setup monitoring with grafana[Optional]
+        - Copy the example environment file:
+            ```sh
+            cp .env.config.grafana.example .env.config.grafana
+            ```
+
 3. Build and Run with Docker:
     ```sh
     docker compose up -d --build
     ```
 4. Verify the installation:
    - API Documentation: http://localhost:8000/docs
+   - API health(grafana): http://localhost:3000/d/monitoring/service-monitoring
 
 ## Project Structure
 ```
@@ -58,4 +69,9 @@ A FastAPI-based backend application developed as part of the application process
 │   ├── infrastructure/      # Database and external services
 │   ├── presenters/         # Controllers and routing
 │   └── main/              # Application configuration
+├── migrations/
+│   ├── versions/           # Database migration files
+│   ├── env.py             # Migration environment configuration
+│   └── script.py.mako     # Migration script template
+│   └── alembic.ini        # Alembic configuration file
 ```

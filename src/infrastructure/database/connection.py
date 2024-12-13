@@ -6,7 +6,7 @@ from src.utils import settings
 from asyncio import sleep
 
 
-engine = create_async_engine(settings.POSTGRE_URL)
+engine = create_async_engine(settings.POSTGRES_URL)
 
 
 sync_maker = sessionmaker()
