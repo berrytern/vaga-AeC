@@ -24,10 +24,23 @@ services:
     networks:
       - aec-postgres-network
       - aec-prometheus-network
+      - aec-redis-network
     logging:
       driver: json-file
       options:
         max-size: 100m
+
+  redis:
+    image: redis:alpine
+    container_name: aec-redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - aec-redis-network
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
 
   postgres:
     image: postgres:14-alpine
@@ -123,6 +136,7 @@ volumes:
   prometheus_data:
   alertmanager_data:
   grafana_data:
+  redis_data:
 
 networks:
   aec-prometheus-network:
@@ -136,4 +150,7 @@ networks:
     driver: bridge
   grafana-prometheus-network:
     name: grafana-prometheus-network
+    driver: bridge
+  aec-redis-network:
+    name: aec-redis-network
     driver: bridge
