@@ -5,7 +5,7 @@ groups:
   # Alert for any instance that is unreachable for >2 minutes.
   - alert: service_down
     expr: up == 0
-    for: 1m
+    for: 2m
     labels:
       severity: critical
     annotations:
