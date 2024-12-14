@@ -1,34 +1,34 @@
 groups:
-- name: example
+- name: health
   rules:
 
   # Alert for any instance that is unreachable for >2 minutes.
   - alert: service_down
     expr: up == 0
-    for: 2m
+    for: 1m
     labels:
-      severity: page
+      severity: critical
     annotations:
-      summary: "Instance {{ $labels.instance }} down"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+      summary: "Instance {{ $labels.job }} is down"
+      description: "{{ $labels.job }} of group={{ $labels.group }} has been down for more than 2 minutes."
 
   - alert: high_load
     expr: node_load1 > 0.5
     for: 2m
     labels:
-      severity: page
+      severity: warning
     annotations:
       summary: "Instance {{ $labels.instance }} under high load"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+      description: "{{ $labels.job }} of group={{ $labels.group }} is under high load."
     
-  - alert: HighErrorRate
+  - alert: high_error_rate
     expr: |
       sum(rate(http_requests_total{job="aec-backend",status=~"5.."}[5m])) 
       / 
       sum(rate(http_requests_total{job="aec-backend"}[5m])) > 0.05
     for: 5m
     labels:
-      severity: warning
+      severity: critical
     annotations:
-      summary: "Taxa de Erros Alta - {{ $labels.instance }}"
-      description: "Taxa de erros > 5% nos últimos 5 minutos"
+      summary: "High Error Rate - {{ $labels.job }} of group={{ $labels.group }}"
+      description: "Error rate > 5% in the last 5 minutes"

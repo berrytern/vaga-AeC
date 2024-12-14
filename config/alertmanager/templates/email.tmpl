@@ -1,0 +1,22 @@
+{{ define "email.default.html" }}
+<!DOCTYPE html>
+<html>
+<body>
+<h1>{{ .Status | toUpper }} - {{ .GroupLabels.alertname }}</h1>
+
+<h2>Alert Details:</h2>
+<table>
+    <tr><td><b>Status:</b></td><td>{{ .Status }}</td></tr>
+    {{ if .CommonAnnotations }}
+    <tr><td><b>Summary:</b></td><td>{{ .CommonAnnotations.summary }}</td></tr>
+    <tr><td><b>Description:</b></td><td>{{ .CommonAnnotations.description }}</td></tr>
+    {{ end }}
+    {{ range .Alerts }}
+    <tr><td><b>Start Time:</b></td><td>{{ .StartsAt }}</td></tr>
+    {{ end }}
+</table>
+
+<p><small>Sent by Prometheus/Alertmanager</small></p>
+</body>
+</html>
+{{ end }}
