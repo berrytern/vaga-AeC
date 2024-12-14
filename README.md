@@ -10,6 +10,7 @@ A FastAPI-based backend application developed as part of the application process
 - Favorite Books System
 - PostgreSQL Database Integration
 - Automated Database Migrations with version control
+- Redis-based response caching
 - Async Operations
 - Docker Containerization
 - Application Monitoring and Observability
@@ -31,6 +32,7 @@ A FastAPI-based backend application developed as part of the application process
   - Automatic migration generation
   - Forward and rollback support
 - PostgreSQL
+- Redis
 - Docker & Docker Compose
 - Pydantic for data validation
 - JWT Authentication
