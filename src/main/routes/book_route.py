@@ -8,7 +8,7 @@ from src.application.domain.models import (
     BookList,
 )
 from src.di import DI
-from src.main.middlewares import auth_middleware, session_middleware
+from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
 
 BOOK_ROUTER = APIRouter()
 
@@ -25,6 +25,7 @@ async def create_new_book(request: Request, book: CreateBookModel):
 
 @BOOK_ROUTER.get("/", response_model=BookList)
 @auth_middleware("bk:ra")
+@cache_middleware(5)
 @session_middleware
 async def get_all_books(request: Request):
     query_params = dict(request.query_params)
@@ -38,6 +39,7 @@ async def get_all_books(request: Request):
 
 @BOOK_ROUTER.get("/{book_id}", response_model=BookModel)
 @auth_middleware("bk:r")
+@cache_middleware(5)
 @session_middleware
 async def get_one_book(request: Request, book_id: str):
     response = await DI.book_controller(request.state.db_session).get_one(book_id)

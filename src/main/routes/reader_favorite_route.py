@@ -6,7 +6,7 @@ from src.application.domain.models import (
     FavoriteQueryModel,
 )
 from src.di import DI
-from src.main.middlewares import auth_middleware, session_middleware
+from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
 
 READER_FAVORITE_ROUTER = APIRouter()
 
@@ -27,6 +27,7 @@ async def set_book_as_favorite(request: Request, reader_id: str, book_id: str):
 
 @READER_FAVORITE_ROUTER.get("/{reader_id}/favorites", response_model=FavoriteList)
 @auth_middleware("bkf:r")
+@cache_middleware(5)
 @session_middleware
 async def get_all_favorite_books_of_reader(request: Request, reader_id: str):
     query_params = dict(request.query_params)
@@ -44,6 +45,7 @@ async def get_all_favorite_books_of_reader(request: Request, reader_id: str):
     "/{reader_id}/favorites/{book_id}", response_model=FavoriteModel
 )
 @auth_middleware("bkf:r")
+@cache_middleware(5)
 @session_middleware
 async def get_one_favorite_book_of_reader(
     request: Request, reader_id: str, book_id: str

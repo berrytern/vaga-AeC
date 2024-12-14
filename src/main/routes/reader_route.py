@@ -8,7 +8,7 @@ from src.application.domain.models import (
     ReaderList,
 )
 from src.di import DI
-from src.main.middlewares import auth_middleware, session_middleware
+from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
 
 READER_ROUTER = APIRouter()
 
@@ -25,6 +25,7 @@ async def create_new_reader(request: Request, reader: CreateReaderModel):
 
 @READER_ROUTER.get("/", response_model=ReaderList)
 @auth_middleware("rd:ra")
+@cache_middleware(5)
 @session_middleware
 async def get_all_readers(request: Request):
     query_params = dict(request.query_params)
@@ -38,6 +39,7 @@ async def get_all_readers(request: Request):
 
 @READER_ROUTER.get("/{reader_id}", response_model=ReaderModel)
 @auth_middleware("rd:r")
+@cache_middleware(5)
 @session_middleware
 async def get_one_reader(request: Request, reader_id: str):
     response = await DI.reader_controller(request.state.db_session).get_one(reader_id)
