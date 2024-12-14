@@ -18,6 +18,7 @@ bcrypt = "^4.2.1"
 pydantic = {extras = ["email"], version = "^2.10.2"}
 asyncpg = "^0.30.0"
 prometheus-client = "^0.21.1"
+redis = "^5.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
