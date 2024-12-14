@@ -1,14 +1,12 @@
-from typing import Optional, Union, List
+from typing import Optional, List
 from .credential_model import CreateAuthModel
 from .query_model import QueryModel
-from src.application.domain.utils import TypeOpStr
 from pydantic import (
     BaseModel,
     RootModel,
     ConfigDict,
     Field,
     field_serializer,
-    field_validator,
     EmailStr,
     StrictStr,
 )
@@ -56,22 +54,6 @@ class AdminList(RootModel):
 
 
 class AdminQueryModel(QueryModel):
-    id: Optional[List[UUID]] = None
-    name: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-    email: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-
-    @staticmethod
-    def integrate_regex(text: str) -> str:
-        # text = f"^{text}" if text[0] != ["*"] else text.replace("*", ".*", 1)
-        # text = f"{text}$" if text[-1] != ["*"] else text.replace("*", ".*", 1)
-
-        return text  # .replace("*", ".*")
-
-    @field_validator("name", "email")
-    def Opvalidator(cls, v) -> List[Union[TypeOpStr, str]]:
-        return [
-            TypeOpStr(index)
-            if TypeOpStr.validate_format(index)
-            else cls.integrate_regex(index)
-            for index in v
-        ]
+    id: Optional[UUID] = None
+    name: Optional[StrictStr] = None
+    email: Optional[StrictStr] = None
