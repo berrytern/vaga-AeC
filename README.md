@@ -52,6 +52,8 @@ A FastAPI-based backend application developed as part of the application process
             ```sh
             cp .env.config.grafana.example .env.config.grafana
             ```
+    3. Setup email alerts [Optional]
+        - Check the [EMAIL_ALERTS](./EMAIL_ALERTS.md) file
 
 3. Build and Run with Docker:
     ```sh
