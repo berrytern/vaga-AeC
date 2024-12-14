@@ -1,0 +1,31 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'example@gmail.com'
+  smtp_auth_username: 'example@gmail.com'
+  smtp_auth_password: 'email-password'
+  smtp_require_tls: true
+
+templates:
+- '/etc/alertmanager/templates/*.tmpl'
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'email-notifications'
+
+receivers:
+- name: 'email-notifications'
+  email_configs:
+  - to: 'example@gmail.com'
+    send_resolved: true
+    html: '{{ template "email.default.html" . }}'
+    headers:
+      subject: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+#       slack_configs:
+#           - send_resolved: true
+#             username: '<username>'
+#             channel: '#<channel-name>'
+#             api_url: '<incomming-webhook-url>'

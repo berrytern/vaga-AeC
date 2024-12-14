@@ -62,9 +62,6 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - 9090:9090
-    links:
-      - cadvisor:cadvisor
-      - alertmanager:alertmanager
     networks:
       - aec-prometheus-network
       - prometheus-internal-network
@@ -73,6 +70,7 @@ services:
 
   alertmanager:
     image: prom/alertmanager
+    container_name: alertmanager
     ports:
       - 9093:9093
     volumes:
@@ -89,6 +87,7 @@ services:
 #          - node.hostname == ${HOSTNAME}
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
+    container_name: cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -103,6 +102,7 @@ services:
       mode: global
   grafana:
     image: grafana/grafana
+    container_name: grafana
     depends_on:
       - prometheus
     ports:

@@ -12,6 +12,14 @@ A FastAPI-based backend application developed as part of the application process
 - Automated Database Migrations with version control
 - Async Operations
 - Docker Containerization
+- Application Monitoring and Observability
+  - Real-time metrics collection
+  - Performance tracking
+  - Request/Response monitoring
+- Automated Alert System
+  - Email notifications for critical events
+  - Customizable alert thresholds
+  - Proactive system monitoring
 
 ## Tech Stack
 
@@ -26,6 +34,11 @@ A FastAPI-based backend application developed as part of the application process
 - Docker & Docker Compose
 - Pydantic for data validation
 - JWT Authentication
+- Monitoring Stack
+  - Prometheus for metrics collection
+  - Grafana for visualization
+  - AlertManager for notification management
+  - Pre-configured monitoring dashboards
 
 ## Prerequisites
 
@@ -52,6 +65,8 @@ A FastAPI-based backend application developed as part of the application process
             ```sh
             cp .env.config.grafana.example .env.config.grafana
             ```
+    3. Setup email alerts [Optional]
+        - Check the [EMAIL_ALERTS](./EMAIL_ALERTS.md) file
 
 3. Build and Run with Docker:
     ```sh
