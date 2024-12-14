@@ -7,4 +7,4 @@ logs/*.log
 mult_proc/*.db
 .history/*
 .env.config.grafana
-./config/alertmanager/config.yml
+config/alertmanager/config.yml
