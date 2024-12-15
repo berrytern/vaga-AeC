@@ -7,3 +7,5 @@
 .env.example
 # Logs files
 logs/*.log
+# config files
+config/
