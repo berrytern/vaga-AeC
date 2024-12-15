@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from asyncpg.exceptions import PostgresError
 from sqlalchemy.exc import IntegrityError
+from jwt.exceptions import ExpiredSignatureError
 from http import HTTPStatus
 
 
@@ -35,6 +36,17 @@ class APIExceptionManager:
                 HTTPStatus.CONFLICT.value,
                 HTTPStatus.CONFLICT.name,
                 HTTPStatus.CONFLICT.description,
+            )
+            return JSONResponse(error.to_json(), status_code=error.status_code)
+
+        @app.exception_handler(ExpiredSignatureError)
+        async def handle_expired_signature_exceptions(
+            request, exc: ExpiredSignatureError
+        ):
+            error = CustomHTTPException(
+                HTTPStatus.UNAUTHORIZED.value,
+                HTTPStatus.UNAUTHORIZED.name,
+                "Token was expired",
             )
             return JSONResponse(error.to_json(), status_code=error.status_code)
 

@@ -1,5 +1,6 @@
 from typing import Optional
 from src.application.domain.utils import UserTypes
+from src.infrastructure.cache import RedisClient
 from src.utils import settings
 from fastapi import Request, HTTPException
 from typing import Callable
@@ -51,6 +52,8 @@ def auth_middleware(scope: str, id_key: Optional[str] = None):
                 if token.startswith("Bearer "):
                     token = token.split(" ")[1]
                 # Decode and validate the token
+                if await RedisClient.get(token):
+                    raise HTTPException(status_code=401, detail="Revoked token")
                 payload = jwt.decode(
                     token, settings.JWT_SECRET, algorithms=["HS256"], verify=True
                 )

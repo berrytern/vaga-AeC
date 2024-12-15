@@ -1,11 +1,9 @@
 from typing import Callable
+from src.infrastructure.cache import RedisClient
 from fastapi import Request, Response
 from functools import wraps
 from json import loads, dumps
 from starlette.responses import JSONResponse
-from redis.asyncio import Redis
-
-redis_client = Redis(host="redis", port=6379, db=0)
 
 
 def cache_middleware(expiration_time: int):
@@ -15,7 +13,7 @@ def cache_middleware(expiration_time: int):
             key = f"{request.method}-{request.url.path}" + str(
                 sorted(request.query_params.items())
             )
-            cached_data = await redis_client.get(key)
+            cached_data = await RedisClient.get(key)
             if cached_data:
                 cached_response = loads(cached_data)
                 return Response(
@@ -31,7 +29,7 @@ def cache_middleware(expiration_time: int):
                     item[0].decode(): item[1].decode() for item in response.raw_headers
                 },
             }
-            await redis_client.setex(key, expiration_time, dumps(cached_response))
+            await RedisClient.setex(key, expiration_time, dumps(cached_response))
             return response
 
         return wrapper
