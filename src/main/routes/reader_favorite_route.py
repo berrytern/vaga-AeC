@@ -14,7 +14,7 @@ READER_FAVORITE_ROUTER = APIRouter()
 @READER_FAVORITE_ROUTER.post(
     "/{reader_id}/favorites/{book_id}", response_model=FavoriteModel
 )
-@auth_middleware("bkf:c")
+@auth_middleware("bkf:c", "reader_id")
 @session_middleware
 async def set_book_as_favorite(request: Request, reader_id: str, book_id: str):
     response = await DI.reader_favorite_controller(request.state.db_session).create(
@@ -26,7 +26,7 @@ async def set_book_as_favorite(request: Request, reader_id: str, book_id: str):
 
 
 @READER_FAVORITE_ROUTER.get("/{reader_id}/favorites", response_model=FavoriteList)
-@auth_middleware("bkf:r")
+@auth_middleware("bkf:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
 async def get_all_favorite_books_of_reader(request: Request, reader_id: str):
@@ -44,7 +44,7 @@ async def get_all_favorite_books_of_reader(request: Request, reader_id: str):
 @READER_FAVORITE_ROUTER.get(
     "/{reader_id}/favorites/{book_id}", response_model=FavoriteModel
 )
-@auth_middleware("bkf:r")
+@auth_middleware("bkf:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
 async def get_one_favorite_book_of_reader(
@@ -60,7 +60,7 @@ async def get_one_favorite_book_of_reader(
 
 
 @READER_FAVORITE_ROUTER.delete("/{reader_id}/favorites/{book_id}", response_model=None)
-@auth_middleware("bkf:d")
+@auth_middleware("bkf:d", "reader_id")
 @session_middleware
 async def delete_one_favorite_book_of_reader(
     request: Request, reader_id: str, book_id: str

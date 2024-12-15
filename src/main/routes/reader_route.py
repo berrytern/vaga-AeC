@@ -38,7 +38,7 @@ async def get_all_readers(request: Request):
 
 
 @READER_ROUTER.get("/{reader_id}", response_model=ReaderModel)
-@auth_middleware("rd:r")
+@auth_middleware("rd:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
 async def get_one_reader(request: Request, reader_id: str):
@@ -49,7 +49,7 @@ async def get_one_reader(request: Request, reader_id: str):
 
 
 @READER_ROUTER.put("/{reader_id}", response_model=ReaderModel)
-@auth_middleware("rd:u")
+@auth_middleware("rd:u", "reader_id")
 @session_middleware
 async def update_reader_info(
     request: Request, reader_id: str, reader: UpdateReaderModel
@@ -63,7 +63,7 @@ async def update_reader_info(
 
 
 @READER_ROUTER.delete("/{reader_id}", response_model=bool)
-@auth_middleware("rd:d")
+@auth_middleware("rd:d", "reader_id")
 @session_middleware
 async def delete_reader_info(request: Request, reader_id: str):
     response = await DI.reader_controller(request.state.db_session).delete_one(
