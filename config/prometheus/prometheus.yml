@@ -19,8 +19,11 @@ scrape_configs:
           - 'localhost:9090'
   - job_name: aec-backend
     scrape_interval: 30s
+    scheme: https  # Specify HTTPS scheme
+    tls_config:
+      insecure_skip_verify: true  # Skip certificate verification
     static_configs:
       - targets:
-          - 'backend:8000'
+          - 'backend:8001'
         labels:
           group: dev
