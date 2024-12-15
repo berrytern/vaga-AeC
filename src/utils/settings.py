@@ -12,7 +12,11 @@ APP_LOGGER_FILE = os.getenv("APP_LOGGER_FILE", "app.log")
 EXCEPTIONS_LOGGER_FILE = os.getenv("EXCEPTIONS_LOGGER_FILE", "exceptions.log")
 
 # Define the port for the HTTP server
-HTTP_PORT = int(os.getenv("PORT_HTTP", "8000"))
+HTTP_PORT = int(os.getenv("HTTP_PORT", "8000"))
+HTTPS_PORT = int(os.getenv("HTTPS_PORT", "8001"))
+SSL_CA_PATH = os.getenv("SSL_CA_PATH")
+SSL_KEY_PATH = os.getenv("SSL_KEY_PATH")
+SSL_CERT_PATH = os.getenv("SSL_CERT_PATH")
 
 # Define the issuer for the JWT
 ISSUER = os.getenv("ISSUER", "berrytern")

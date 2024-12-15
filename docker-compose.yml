@@ -7,7 +7,11 @@ services:
       - postgres
     restart: always
     environment:
-      - PORT_HTTP=${PORT_HTTP}
+      - HTTP_PORT=${HTTP_PORT}
+      - HTTPS_PORT=${HTTPS_PORT}
+      - SSL_CA_PATH=${SSL_CA_PATH}
+      - SSL_KEY_PATH=${SSL_KEY_PATH}
+      - SSL_CERT_PATH=${SSL_CERT_PATH}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - EMAIL_LOGIN=${EMAIL_LOGIN}
@@ -20,7 +24,8 @@ services:
     volumes:
       - ./.certs/aec-back/:/etc/.certs/:ro
     ports:
-      - ${PORT_HTTP}:${PORT_HTTP}
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
     networks:
       - aec-postgres-network
       - aec-prometheus-network

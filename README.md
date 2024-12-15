@@ -5,6 +5,7 @@ A FastAPI-based backend application developed as part of the application process
 ## Features
 
 - User Authentication and Authorization
+  - Resource ownership validation
 - Book Management (CRUD operations)
 - Reader Profile Management
 - Favorite Books System
@@ -12,6 +13,7 @@ A FastAPI-based backend application developed as part of the application process
 - Automated Database Migrations with version control
 - Redis-based response caching
 - Async Operations
+- HTTPS support
 - Docker Containerization
 - Application Monitoring and Observability
   - Real-time metrics collection

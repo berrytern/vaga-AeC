@@ -34,7 +34,7 @@ class AuthService:
         current = datetime.utcnow()
         token = jwt.encode(
             {
-                "sub": str(result["id"]),
+                "sub": str(result["foreign_id"]),
                 "iss": settings.ISSUER,
                 "type": result["user_type"],
                 "iat": current,

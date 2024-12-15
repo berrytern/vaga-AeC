@@ -1,3 +1,5 @@
+from typing import Optional
+from src.application.domain.utils import UserTypes
 from src.utils import settings
 from fastapi import Request, HTTPException
 from typing import Callable
@@ -7,12 +9,13 @@ import jwt
 
 
 # This is a middleware function that checks for the presence of a valid JWT token in the Authorization header
-def auth_middleware(scope: str):
+def auth_middleware(scope: str, id_key: Optional[str] = None):
     """
     Creates a decorator that validates JWT tokens and checks for required scope.
 
     Args:
         scope (str): The required scope that must be present in the JWT token's payload.
+        id_key (Optional[str]): The key in the endpoint's kwargs that contains the user ID.
 
     Returns:
         Callable: A decorator function that wraps API endpoints with JWT authentication.
@@ -54,6 +57,14 @@ def auth_middleware(scope: str):
                 if scope not in payload["scope"]:
                     raise HTTPException(
                         status_code=401, detail="Invalid or expired token"
+                    )
+                if (
+                    id_key
+                    and kwargs[id_key] != payload["sub"]
+                    and payload["type"] != UserTypes.ADMIN.value
+                ):
+                    raise HTTPException(
+                        status_code=401, detail="Resource not owned by user"
                     )
 
                 # Add the payload to the request state for use in the endpoint
