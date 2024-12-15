@@ -60,6 +60,10 @@ class RefreshCredentialModel(BaseModel):
     refresh_token: StrictStr
 
 
+class RevokeCredentialModel(BaseModel):
+    access_token: StrictStr
+
+
 class ResetCredentialModel(BaseModel):
     email: StrictStr
     old_password: StrictStr
