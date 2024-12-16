@@ -1,13 +1,11 @@
-from typing import Optional, Union, List
+from typing import Optional, List
 from .query_model import QueryModel
-from src.application.domain.utils import TypeOpStr, TypeOpFloat
 from pydantic import (
     BaseModel,
     RootModel,
     ConfigDict,
     Field,
     field_serializer,
-    validator,
     StrictStr,
     StrictFloat,
 )
@@ -70,9 +68,9 @@ class BookList(RootModel):
 
 class BookQueryModel(QueryModel):
     id: Optional[List[UUID]] = None
-    title: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-    description: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-    price: Optional[List[Union[TypeOpFloat, StrictStr]]] = None
+    title: Optional[StrictStr] = None
+    description: Optional[StrictStr] = None
+    price: Optional[float] = None
 
     @staticmethod
     def integrate_regex(text: str) -> str:
@@ -80,21 +78,3 @@ class BookQueryModel(QueryModel):
         # text = f"{text}$" if text[-1] != ["*"] else text.replace("*", ".*", 1)
 
         return text  # .replace("*", ".*")
-
-    @validator("title", "description")
-    def str_validator(cls, v) -> List[Union[TypeOpStr, str]]:
-        return [
-            TypeOpStr(index)
-            if TypeOpStr.validate_format(index)
-            else cls.integrate_regex(index)
-            for index in v
-        ]
-
-    @validator("price")
-    def float_validator(cls, v) -> List[Union[TypeOpFloat, str]]:
-        return [
-            TypeOpFloat(index)
-            if TypeOpFloat.validate_format(index)
-            else cls.integrate_regex(index)
-            for index in v
-        ]

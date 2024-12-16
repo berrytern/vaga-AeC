@@ -7,7 +7,6 @@ from pydantic import (
     ConfigDict,
     Field,
     field_serializer,
-    EmailStr,
     StrictStr,
 )
 from uuid import UUID
@@ -16,18 +15,15 @@ from datetime import datetime
 
 class CreateAdminModel(CreateAuthModel):
     name: StrictStr = Field(..., min_length=10, max_length=60)
-    email: EmailStr = Field(..., min_length=10, max_length=250)
 
 
 class UpdateAdminModel(BaseModel):
     name: Optional[StrictStr] = Field(None, min_length=10, max_length=60)
-    email: Optional[EmailStr] = Field(None, min_length=10, max_length=250)
 
 
 class AdminModel(BaseModel):
     id: Optional[UUID] = None
     name: Optional[StrictStr] = None
-    email: Optional[EmailStr] = None
     created_at: Optional[datetime] = Field(
         default_factory=lambda: datetime.now().replace(microsecond=0)
     )
@@ -56,4 +52,3 @@ class AdminList(RootModel):
 class AdminQueryModel(QueryModel):
     id: Optional[UUID] = None
     name: Optional[StrictStr] = None
-    email: Optional[StrictStr] = None
