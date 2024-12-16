@@ -9,6 +9,7 @@ class AuthSchema(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     username = Column(String(30), unique=True, nullable=False, index=True)
+    email = Column(String, unique=True)
     user_type = Column(String(30), nullable=False)
     password = Column(String)
     refresh_token = Column(String, nullable=True)
@@ -17,8 +18,14 @@ class AuthSchema(Base):
 
     def __repr__(self) -> str:
         return (
-            '{"id": "' + str(self.id) + '", "username": "' + str(self.username) + '", '
-            '"user_type": "'
+            '{"id": "'
+            + str(self.id)
+            + '", "username": "'
+            + str(self.username)
+            + '", '
+            + '"email": "'
+            + str(self.email)
+            + '", "user_type": "'
             + str(self.user_type)
             + '", "last_login: "'
             + str(self.last_login)
