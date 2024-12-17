@@ -18,6 +18,7 @@ class AuthRepository:
             .returning(
                 AuthSchema.id,
                 AuthSchema.username,
+                AuthSchema.email,
                 AuthSchema.user_type,
                 AuthSchema.last_login,
                 AuthSchema.foreign_id,
@@ -30,9 +31,10 @@ class AuthRepository:
                 AuthModel(
                     id=result[0],
                     username=result[1],
-                    user_type=result[2],
-                    last_login=result[3],
-                    foreign_id=result[4],
+                    email=result[2],
+                    user_type=result[3],
+                    last_login=result[4],
+                    foreign_id=result[5],
                 ).model_dump_json(exclude_none=True)
             )
         return result
@@ -52,6 +54,7 @@ class AuthRepository:
                     id=item.id,
                     username=item.username,
                     password=item.password,
+                    email=item.email,
                     user_type=item.user_type,
                     last_login=item.last_login,
                     foreign_id=item.foreign_id,
@@ -77,6 +80,7 @@ class AuthRepository:
             .returning(
                 AuthSchema.id,
                 AuthSchema.username,
+                AuthSchema.email,
                 AuthSchema.last_login,
                 AuthSchema.user_type,
                 AuthSchema.foreign_id,
@@ -90,6 +94,7 @@ class AuthRepository:
                 AuthModel(
                     id=result.id,
                     username=result.username,
+                    email=result.email,
                     user_type=result.user_type,
                     last_login=result.last_login,
                     foreign_id=result.foreign_id,

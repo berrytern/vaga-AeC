@@ -12,7 +12,7 @@ from datetime import datetime
 class AuthModel(BaseModel):
     id: Optional[UUID] = None
     username: Optional[StrictStr] = None
-    email: EmailStr = Field(..., min_length=10, max_length=250)
+    email: Optional[EmailStr] = Field(None, min_length=10, max_length=250)
     user_type: Optional[StrictStr] = None
     password: Optional[StrictStr] = None
     refresh_token: Optional[StrictStr] = None
