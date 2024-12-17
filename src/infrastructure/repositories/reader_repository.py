@@ -30,7 +30,6 @@ class ReaderRepository:
             .returning(
                 self.schema.id,
                 self.schema.name,
-                self.schema.email,
                 self.schema.birthday,
                 self.schema.books_read_count,
                 self.schema.created_at,
@@ -43,11 +42,10 @@ class ReaderRepository:
             self.model(
                 id=result[0],
                 name=result[1],
-                email=result[2],
-                birthday=result[3],
-                books_read_count=result[4],
-                created_at=result[5],
-                updated_at=result[6],
+                birthday=result[2],
+                books_read_count=result[3],
+                created_at=result[4],
+                updated_at=result[5],
             ).model_dump_json()
         )
 
@@ -65,7 +63,6 @@ class ReaderRepository:
                 self.model(
                     id=cast(UUID, item.id),
                     name=cast(str, item.name),
-                    email=cast(str, item.email),
                     birthday=cast(datetime, item.birthday),
                     books_read_count=item.books_read_count,
                     created_at=item.created_at,
@@ -91,7 +88,6 @@ class ReaderRepository:
             .returning(
                 self.schema.id,
                 self.schema.name,
-                self.schema.email,
                 self.schema.birthday,
                 self.schema.books_read_count,
                 self.schema.created_at,
@@ -106,11 +102,10 @@ class ReaderRepository:
                 self.model(
                     id=result[0],
                     name=result[1],
-                    email=result[2],
-                    birthday=result[3],
-                    books_read_count=result[4],
-                    created_at=result[5],
-                    updated_at=result[6],
+                    birthday=result[2],
+                    books_read_count=result[3],
+                    created_at=result[4],
+                    updated_at=result[5],
                 ).model_dump_json()
             )
         return result
@@ -123,7 +118,6 @@ class ReaderRepository:
             .returning(
                 self.schema.id,
                 self.schema.name,
-                self.schema.email,
                 self.schema.birthday,
                 self.schema.books_read_count,
                 self.schema.created_at,
@@ -138,11 +132,10 @@ class ReaderRepository:
                 self.model(
                     id=result[0],
                     name=result[1],
-                    email=result[2],
-                    birthday=result[3],
-                    books_read_count=result[4],
-                    created_at=result[5],
-                    updated_at=result[6],
+                    birthday=result[2],
+                    books_read_count=result[3],
+                    created_at=result[4],
+                    updated_at=result[5],
                 ).model_dump_json()
             )
         return result

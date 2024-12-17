@@ -10,7 +10,6 @@ class AdminSchema(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String(60))
-    email = Column(String, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -22,8 +21,6 @@ class AdminSchema(Base):
             + str(self.id)
             + '", "name": "'
             + str(self.name)
-            + '", "email": "'
-            + str(self.email)
             + '", "created_at": "'
             + str(self.created_at)
             + '", "updated_at": "'

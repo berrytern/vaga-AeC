@@ -10,7 +10,6 @@ class ReaderSchema(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String(60))
-    email = Column(String, unique=True)
     birthday = Column(Date)
     books_read_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -24,8 +23,6 @@ class ReaderSchema(Base):
             + str(self.id)
             + '", "name": "'
             + str(self.name)
-            + '", "email": "'
-            + str(self.email)
             + '", "birthday": "'
             + str(self.birthday)
             + '", "books_read_count": "'

@@ -21,7 +21,7 @@ class AdminService:
         result = await self.repository.create(
             admin.model_dump(
                 exclude_none=True,
-                exclude={"id", "username", "password"},
+                exclude={"id", "username", "password", "email"},
             )
         )
         admin.password = bcrypt.hashpw(

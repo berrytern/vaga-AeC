@@ -8,8 +8,6 @@ from pydantic import (
     ConfigDict,
     Field,
     field_serializer,
-    field_validator,
-    EmailStr,
     StrictStr,
 )
 from uuid import UUID
@@ -18,7 +16,6 @@ from datetime import date, datetime
 
 class CreateReaderModel(CreateAuthModel):
     name: StrictStr = Field(..., min_length=10, max_length=60)
-    email: EmailStr = Field(..., min_length=10, max_length=250)
     birthday: date = Field(..., description="Format: YYYY-MM-DD")
 
     model_config = ConfigDict(
@@ -34,7 +31,6 @@ class CreateReaderModel(CreateAuthModel):
 
 class UpdateReaderModel(BaseModel):
     name: Optional[StrictStr] = None
-    email: Optional[EmailStr] = None
     birthday: Optional[date] = None
 
     model_config = ConfigDict(
@@ -51,7 +47,6 @@ class UpdateReaderModel(BaseModel):
 class ReaderModel(BaseModel):
     id: Optional[UUID] = None
     name: Optional[StrictStr] = None
-    email: Optional[EmailStr] = None
     birthday: Optional[date] = None
     books_read_count: Optional[int] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
@@ -83,30 +78,4 @@ class ReaderList(RootModel):
 class ReaderQueryModel(QueryModel):
     id: Optional[List[UUID]] = None
     name: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-    email: Optional[List[Union[TypeOpStr, StrictStr]]] = None
     birthday: Optional[List[Union[TypeOpDate, StrictStr]]] = None
-
-    @staticmethod
-    def integrate_regex(text: str) -> str:
-        # text = f"^{text}" if text[0] != ["*"] else text.replace("*", ".*", 1)
-        # text = f"{text}$" if text[-1] != ["*"] else text.replace("*", ".*", 1)
-
-        return text  # .replace("*", ".*")
-
-    @field_validator("name", "email")
-    def str_validator(cls, v) -> List[Union[TypeOpStr, str]]:
-        return [
-            TypeOpStr(index)
-            if TypeOpStr.validate_format(index)
-            else cls.integrate_regex(index)
-            for index in v
-        ]
-
-    @field_validator("birthday")
-    def date_validator(cls, v) -> List[Union[TypeOpDate, str]]:
-        return [
-            TypeOpDate(index)
-            if TypeOpDate.validate_format(index)
-            else cls.integrate_regex(index)
-            for index in v
-        ]

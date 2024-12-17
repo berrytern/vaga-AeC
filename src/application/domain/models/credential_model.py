@@ -1,10 +1,11 @@
-from pydantic import BaseModel, StrictStr, Field, field_validator
+from pydantic import BaseModel, StrictStr, EmailStr, Field, field_validator
 from pydantic_core import PydanticCustomError
 import re
 
 
 class CreateAuthModel(BaseModel):
     username: StrictStr = Field(..., min_length=6)
+    email: EmailStr = Field(..., min_length=10, max_length=250)
     password: StrictStr = Field(
         ...,
         min_length=6,
@@ -58,6 +59,10 @@ class CredentialModel(BaseModel):
 class RefreshCredentialModel(BaseModel):
     access_token: StrictStr
     refresh_token: StrictStr
+
+
+class RevokeCredentialModel(BaseModel):
+    access_token: StrictStr
 
 
 class ResetCredentialModel(BaseModel):

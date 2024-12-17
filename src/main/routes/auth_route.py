@@ -1,9 +1,16 @@
-from src.application.domain.models import CredentialModel, RefreshCredentialModel
+from src.application.domain.models import (
+    CredentialModel,
+    RefreshCredentialModel,
+    RevokeCredentialModel,
+)
+from src.application.services import AuthService
 from src.di import DI
+from src.infrastructure.cache import RedisClient
+from src.main.middlewares import session_middleware
 from pydantic import BaseModel
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
-from src.main.middlewares import session_middleware
+from datetime import datetime
 
 
 class LoginModel(BaseModel):
@@ -35,3 +42,15 @@ async def refresh_token(request: Request, data: RefreshCredentialModel):
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
+
+
+@AUTH_ROUTER.post("/revoke_token")
+async def revoke_token(data: RevokeCredentialModel):
+    if await RedisClient.get(data.access_token):
+        return JSONResponse(
+            "Token was already revoked",
+        )
+    payload = AuthService.decode_token(data.access_token)
+    remaining_time = payload["exp"] - datetime.utcnow().timestamp()
+    await RedisClient.setex(data.access_token, int(remaining_time), "true")
+    return JSONResponse("Token has been revoked")

@@ -20,7 +20,7 @@ class ReaderService:
         result = await self.repository.create(
             reader.model_dump(
                 exclude_none=True,
-                exclude={"id", "username", "password"},
+                exclude={"id", "username", "password", "email"},
             )
         )
         reader.password = bcrypt.hashpw(

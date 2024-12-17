@@ -27,7 +27,6 @@ class AdminRepository:
             .returning(
                 self.schema.id,
                 self.schema.name,
-                self.schema.email,
                 self.schema.created_at,
                 self.schema.updated_at,
             )
@@ -39,9 +38,8 @@ class AdminRepository:
                 self.model(
                     id=result[0],
                     name=result[1],
-                    email=result[2],
-                    created_at=result[3],
-                    updated_at=result[4],
+                    created_at=result[2],
+                    updated_at=result[3],
                 ).model_dump_json()
             )
         return result
@@ -60,7 +58,6 @@ class AdminRepository:
                 self.model(
                     id=item.id,
                     name=item.name,
-                    email=item.email,
                     created_at=item.created_at,
                     updated_at=item.updated_at,
                 ).model_dump_json()
@@ -81,7 +78,6 @@ class AdminRepository:
             .returning(
                 self.schema.id,
                 self.schema.name,
-                self.schema.email,
                 self.schema.created_at,
                 self.schema.updated_at,
             )
@@ -93,9 +89,8 @@ class AdminRepository:
                 self.model(
                     id=result[0],
                     name=result[1],
-                    email=result[2],
-                    created_at=result[3],
-                    updated_at=result[4],
+                    created_at=result[2],
+                    updated_at=result[3],
                 ).model_dump_json()
             )
         return result

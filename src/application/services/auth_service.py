@@ -1,5 +1,6 @@
 from src.application.domain.models import CredentialModel, RefreshCredentialModel
 from src.application.domain.utils import UserTypes, UserScopes
+from src.infrastructure.cache import RedisClient
 from src.infrastructure.repositories import AuthRepository
 from src.presenters.exceptions import UnauthorizedException
 from src.utils import settings, default
@@ -32,15 +33,16 @@ class AuthService:
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
         current = datetime.utcnow()
+        payload = {
+            "sub": str(result["foreign_id"]),
+            "iss": settings.ISSUER,
+            "type": result["user_type"],
+            "iat": current,
+            "scope": str(self._getScopeByUserType(result["user_type"])),
+            "exp": current + timedelta(seconds=default.TOKEN_EXP_TIME),
+        }
         token = jwt.encode(
-            {
-                "sub": str(result["foreign_id"]),
-                "iss": settings.ISSUER,
-                "type": result["user_type"],
-                "iat": current,
-                "scope": str(self._getScopeByUserType(result["user_type"])),
-                "exp": current + timedelta(seconds=default.TOKEN_EXP_TIME),
-            },
+            payload,
             settings.JWT_SECRET,
             algorithm="HS256",
         )
@@ -59,19 +61,25 @@ class AuthService:
         )
         return response
 
+    @staticmethod
+    def decode_token(access_token: str):
+        return jwt.decode(
+            access_token.encode("utf8"),
+            settings.JWT_SECRET,
+            algorithms="HS256",
+            verify=True,
+        )
+
     async def refresh_token(self, data: RefreshCredentialModel):
         result = await self.repository.get_one({"refresh_token": data.refresh_token})
         if result is None:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
+        if await RedisClient.get(data.access_token):
+            raise UnauthorizedException(HTTPStatus.UNAUTHORIZED.phrase, "Revoked token")
         current = datetime.utcnow()
-        _ = jwt.decode(
-            data.access_token.encode("utf8"),
-            settings.JWT_SECRET,
-            algorithms="HS256",
-            verify=True,
-        )
+        _ = self.decode_token(data.access_token)
         if not bcrypt.checkpw(
             data.access_token.encode("utf8"), data.refresh_token.encode("utf8")
         ):
