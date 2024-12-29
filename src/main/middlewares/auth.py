@@ -10,7 +10,7 @@ import jwt
 
 
 # This is a middleware function that checks for the presence of a valid JWT token in the Authorization header
-def auth_middleware(scope: str, id_key: Optional[str] = None):
+def auth_middleware(scope: Optional[str], id_key: Optional[str] = None):
     """
     Creates a decorator that validates JWT tokens and checks for required scope.
 
@@ -57,7 +57,7 @@ def auth_middleware(scope: str, id_key: Optional[str] = None):
                 payload = jwt.decode(
                     token, settings.JWT_SECRET, algorithms=["HS256"], verify=True
                 )
-                if scope not in payload["scope"]:
+                if scope is not None and scope not in payload["scope"]:
                     raise HTTPException(
                         status_code=401, detail="Invalid or expired token"
                     )
