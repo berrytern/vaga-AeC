@@ -19,6 +19,8 @@ from .credential_model import (
     RefreshCredentialModel,
     RevokeCredentialModel,
     ResetCredentialModel,
+    RecoverRequestModel,
+    RecoverPasswordModel,
 )
 from .favorite_model import (
     CreateFavoriteModel,
@@ -51,6 +53,8 @@ __all__ = [
     "RefreshCredentialModel",
     "RevokeCredentialModel",
     "ResetCredentialModel",
+    "RecoverRequestModel",
+    "RecoverPasswordModel",
     "CreateFavoriteModel",
     "FavoriteModel",
     "FavoriteList",

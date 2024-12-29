@@ -65,7 +65,16 @@ class RevokeCredentialModel(BaseModel):
     access_token: StrictStr
 
 
+class RecoverPasswordModel(BaseModel):
+    email: EmailStr = Field(..., min_length=10, max_length=250)
+    security_hash: StrictStr
+    new_password: StrictStr
+
+
+class RecoverRequestModel(BaseModel):
+    username: StrictStr
+
+
 class ResetCredentialModel(BaseModel):
-    email: StrictStr
     old_password: StrictStr
     new_password: StrictStr
