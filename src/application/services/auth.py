@@ -1,17 +1,24 @@
+from typing import Optional
 from src.application.domain.models import (
     CredentialModel,
     RefreshCredentialModel,
     ResetCredentialModel,
+    RecoverPasswordModel,
+    RecoverRequestModel,
 )
 from src.application.domain.utils import UserTypes, UserScopes
 from src.infrastructure.cache import RedisClient
 from src.infrastructure.repositories import AuthRepository
-from src.presenters.exceptions import UnauthorizedException
+from src.presenters.exceptions import (
+    ConflictException,
+    UnauthorizedException,
+    ValidationException,
+)
 from src.utils import settings, default
 from http import HTTPStatus
 from datetime import datetime, timedelta
 from aiosmtplib import SMTP
-from uuid import UUID
+from uuid import UUID, uuid4
 import bcrypt
 import jwt
 
@@ -131,3 +138,44 @@ class AuthService:
             data.new_password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
         return await self.repository.update_one(user_id, {"password": new_password})
+
+    async def reset_password(self, data: RecoverPasswordModel):
+        secret_hash: Optional[str] = await RedisClient.get(
+            f"{default.RESET_PASSWD_PREFIX}{data.username}"
+        )
+        if secret_hash is None:
+            raise ValidationException(
+                HTTPStatus.BAD_REQUEST.phrase, HTTPStatus.BAD_REQUEST.description
+            )
+
+        result = await self.repository.get_one({"username": data.username})
+        if result is None:
+            raise ConflictException(
+                HTTPStatus.CONFLICT.phrase, HTTPStatus.CONFLICT.description
+            )
+        new_password = bcrypt.hashpw(
+            data.new_password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
+        ).decode()
+        return await self.repository.update_one(
+            result["id"], {"password": new_password}
+        )
+
+    async def request_password_reset(self, data: RecoverRequestModel):
+        if (
+            await RedisClient.get(f"{default.RESET_PASSWD_PREFIX}{data.username}")
+            is not None
+        ):
+            raise ConflictException(
+                HTTPStatus.CONFLICT.phrase, HTTPStatus.CONFLICT.description
+            )
+        result = await self.repository.get_one({"username": data.username})
+        if result is None:
+            raise ValidationException(
+                HTTPStatus.BAD_REQUEST.phrase, HTTPStatus.BAD_REQUEST.description
+            )
+        id = str(uuid4())
+        await RedisClient.setex(
+            f"{default.RESET_PASSWD_PREFIX}{data.username}",
+            settings.RESET_PASSWD_EXP,
+            id,
+        )
