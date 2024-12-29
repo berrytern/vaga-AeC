@@ -6,7 +6,10 @@ from src.application.domain.models import (
 from src.application.services import AuthService
 from src.di import DI
 from src.infrastructure.cache import RedisClient
-from src.main.middlewares import session_middleware
+from src.main.middlewares import (
+    rate_limit_middleware,
+    session_middleware,
+)
 from pydantic import BaseModel
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
@@ -27,6 +30,7 @@ AUTH_ROUTER = APIRouter()
 
 
 @AUTH_ROUTER.post("/login", response_model=RefreshCredentialModel)
+@rate_limit_middleware(5, 60)
 @session_middleware
 async def login(request: Request, data: CredentialModel):
     response = await DI.auth_controller(request.state.db_session).login(data)

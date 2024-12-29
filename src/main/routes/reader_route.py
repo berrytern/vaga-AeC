@@ -8,12 +8,18 @@ from src.application.domain.models import (
     ReaderList,
 )
 from src.di import DI
-from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
+from src.main.middlewares import (
+    auth_middleware,
+    cache_middleware,
+    rate_limit_middleware,
+    session_middleware,
+)
 
 READER_ROUTER = APIRouter()
 
 
 @READER_ROUTER.post("/", response_model=ReaderModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("rd:c")
 @session_middleware
 async def create_new_reader(request: Request, reader: CreateReaderModel):
@@ -24,6 +30,7 @@ async def create_new_reader(request: Request, reader: CreateReaderModel):
 
 
 @READER_ROUTER.get("/", response_model=ReaderList)
+@rate_limit_middleware(5, 60)
 @auth_middleware("rd:ra")
 @cache_middleware(5)
 @session_middleware
@@ -38,6 +45,7 @@ async def get_all_readers(request: Request):
 
 
 @READER_ROUTER.get("/{reader_id}", response_model=ReaderModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("rd:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
@@ -49,6 +57,7 @@ async def get_one_reader(request: Request, reader_id: str):
 
 
 @READER_ROUTER.put("/{reader_id}", response_model=ReaderModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("rd:u", "reader_id")
 @session_middleware
 async def update_reader_info(
@@ -63,6 +72,7 @@ async def update_reader_info(
 
 
 @READER_ROUTER.delete("/{reader_id}", response_model=bool)
+@rate_limit_middleware(5, 60)
 @auth_middleware("rd:d", "reader_id")
 @session_middleware
 async def delete_reader_info(request: Request, reader_id: str):
