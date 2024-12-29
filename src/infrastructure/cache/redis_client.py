@@ -14,6 +14,11 @@ class RedisClient:
         return await cls.client.setex(key, expiration_time, value)
 
     @classmethod
-    async def set(cls, key: str, value: Any, if_already_exists: bool = False, keepttl: bool = False):
+    async def set(
+        cls,
+        key: str,
+        value: Any,
+        if_already_exists: bool = False,
+        keepttl: bool = False,
+    ):
         return await cls.client.set(key, value, xx=if_already_exists, keepttl=keepttl)
-    

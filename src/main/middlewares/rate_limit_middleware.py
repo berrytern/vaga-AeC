@@ -8,6 +8,7 @@ from uuid import uuid4
 
 def rate_limit_middleware(limit: int, expiration_time: int, trust_proxy: bool = False):
     id = str(uuid4())
+
     def decorator(next: Callable):
         @wraps(next)
         async def wrapper(request: Request, *args, **kwargs):
