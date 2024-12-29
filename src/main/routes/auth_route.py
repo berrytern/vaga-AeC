@@ -14,28 +14,17 @@ from src.main.middlewares import (
     rate_limit_middleware,
     session_middleware,
 )
-from pydantic import BaseModel
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 from datetime import datetime
 from uuid import UUID
 
 
-class LoginModel(BaseModel):
-    username: str
-    password: str
-
-
-class Login(BaseModel):
-    def __init__(self) -> None:
-        pass
-
-
 AUTH_ROUTER = APIRouter()
 
 
 @AUTH_ROUTER.post("/login", response_model=RefreshCredentialModel)
-@rate_limit_middleware(5, 60)
+@rate_limit_middleware(5, 5*60)
 @session_middleware
 async def login(request: Request, data: CredentialModel):
     response = await DI.auth_controller(request.state.db_session).login(data)
@@ -45,7 +34,7 @@ async def login(request: Request, data: CredentialModel):
 
 
 @AUTH_ROUTER.post("/refresh-token", response_model=RefreshCredentialModel)
-@rate_limit_middleware(5, 60)
+@rate_limit_middleware(2, 10*60)
 @session_middleware
 async def refresh_token(request: Request, data: RefreshCredentialModel):
     response = await DI.auth_controller(request.state.db_session).refresh_token(data)
@@ -55,7 +44,7 @@ async def refresh_token(request: Request, data: RefreshCredentialModel):
 
 
 @AUTH_ROUTER.post("/revoke-token")
-@rate_limit_middleware(5, 60)
+@rate_limit_middleware(2, 60)
 async def revoke_token(data: RevokeCredentialModel):
     if await RedisClient.get(data.access_token):
         return JSONResponse(
@@ -69,7 +58,7 @@ async def revoke_token(data: RevokeCredentialModel):
 
 @AUTH_ROUTER.post("/users/{user_id}/reset-password")
 @auth_middleware("us:u", "user_id")
-@rate_limit_middleware(5, 60)
+@rate_limit_middleware(2, 5*60)
 async def reset_password(request: Request, data: ResetCredentialModel, user_id: UUID):
     response = await DI.auth_controller(request.state.db_session).change_password(data, user_id)
     return JSONResponse(
@@ -78,7 +67,7 @@ async def reset_password(request: Request, data: ResetCredentialModel, user_id: 
 
 
 @AUTH_ROUTER.post("/password/recover-by-email")
-@rate_limit_middleware(2, 60)
+@rate_limit_middleware(1, 10*60)
 async def recover_password_by_email(request: Request, data: RecoverRequestModel):
     response = await DI.auth_controller(request.state.db_session).recover_password_by_email(data)
     return JSONResponse(
