@@ -63,7 +63,7 @@ def auth_middleware(scope: str, id_key: Optional[str] = None):
                     )
                 if (
                     id_key
-                    and kwargs[id_key] != payload["sub"]
+                    and str(kwargs[id_key]) != payload["sub"]
                     and payload["type"] != UserTypes.ADMIN.value
                 ):
                     raise HTTPException(

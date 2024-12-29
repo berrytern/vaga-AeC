@@ -14,6 +14,7 @@ from src.main.middlewares import (
     rate_limit_middleware,
     session_middleware,
 )
+from uuid import UUID
 
 READER_ROUTER = APIRouter()
 
@@ -49,7 +50,7 @@ async def get_all_readers(request: Request):
 @auth_middleware("rd:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
-async def get_one_reader(request: Request, reader_id: str):
+async def get_one_reader(request: Request, reader_id: UUID):
     response = await DI.reader_controller(request.state.db_session).get_one(reader_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
@@ -61,7 +62,7 @@ async def get_one_reader(request: Request, reader_id: str):
 @auth_middleware("rd:u", "reader_id")
 @session_middleware
 async def update_reader_info(
-    request: Request, reader_id: str, reader: UpdateReaderModel
+    request: Request, reader_id: UUID, reader: UpdateReaderModel
 ):
     response = await DI.reader_controller(request.state.db_session).update_one(
         reader_id, reader
@@ -75,7 +76,7 @@ async def update_reader_info(
 @rate_limit_middleware(5, 60)
 @auth_middleware("rd:d", "reader_id")
 @session_middleware
-async def delete_reader_info(request: Request, reader_id: str):
+async def delete_reader_info(request: Request, reader_id: UUID):
     response = await DI.reader_controller(request.state.db_session).delete_one(
         reader_id
     )
