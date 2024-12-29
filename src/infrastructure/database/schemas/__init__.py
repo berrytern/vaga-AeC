@@ -6,11 +6,11 @@ class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
-from .auth_schema import AuthSchema
-from .admin_schema import AdminSchema
-from .book_schema import BookSchema
-from .reader_schema import ReaderSchema
-from .favorite_book_schema import FavoriteBookSchema
+from .auth import AuthSchema
+from .admin import AdminSchema
+from .book import BookSchema
+from .reader import ReaderSchema
+from .favorite_book import FavoriteBookSchema
 
 __all__ = [
     "Base",
