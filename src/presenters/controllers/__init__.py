@@ -1,8 +1,8 @@
-from .admin_controller import AdminController
-from .auth_controller import AuthController
-from .book_controller import BookController
-from .favorite_controller import FavoriteController
-from .reader_controller import ReaderController
+from .admin import AdminController
+from .auth import AuthController
+from .book import BookController
+from .favorite import FavoriteController
+from .reader import ReaderController
 
 __all__ = [
     "AdminController",

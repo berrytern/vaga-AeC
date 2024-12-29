@@ -68,21 +68,21 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
     )
 
 
-@AUTH_ROUTER.post("/password/recover-by-email")
+@AUTH_ROUTER.post("/password/reset-request")
 @rate_limit_middleware(1, 10 * 60)
-async def recover_password_by_email(request: Request, data: RecoverRequestModel):
+async def request_password_reset(request: Request, data: RecoverRequestModel):
     response = await DI.auth_controller(
         request.state.db_session
-    ).recover_password_by_email(data)
+    ).request_password_reset(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
 
 
-@AUTH_ROUTER.post("/password/recover")
+@AUTH_ROUTER.post("/password/reset")
 @rate_limit_middleware(1, 60)
-async def recover_password(request: Request, data: RecoverPasswordModel):
-    response = await DI.auth_controller(request.state.db_session).recover_password(data)
+async def reset_password(request: Request, data: RecoverPasswordModel):
+    response = await DI.auth_controller(request.state.db_session).reset_password(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
