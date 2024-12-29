@@ -56,10 +56,10 @@ async def revoke_token(data: RevokeCredentialModel):
     return JSONResponse("Token has been revoked")
 
 
-@AUTH_ROUTER.post("/users/{user_id}/reset-password")
+@AUTH_ROUTER.post("/users/{user_id}/change-password")
 @auth_middleware("us:u", "user_id")
 @rate_limit_middleware(2, 5*60)
-async def reset_password(request: Request, data: ResetCredentialModel, user_id: UUID):
+async def change_password(request: Request, data: ResetCredentialModel, user_id: UUID):
     response = await DI.auth_controller(request.state.db_session).change_password(data, user_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
