@@ -1,4 +1,4 @@
-from .auth_middleware import auth_middleware
+from .auth_middleware import authenticate_middleware
 from .cache_middleware import cache_middleware
 from .metrics_middleware import register_track_middleware
 from .rate_limit_middleware import rate_limit_middleware

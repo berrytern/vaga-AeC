@@ -10,7 +10,7 @@ import jwt
 
 
 # This is a middleware function that checks for the presence of a valid JWT token in the Authorization header
-def auth_middleware(scope: str, id_key: Optional[str] = None):
+def authenticate_middleware(scope: str, id_key: Optional[str] = None):
     """
     Creates a decorator that validates JWT tokens and checks for required scope.
 
