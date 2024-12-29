@@ -7,6 +7,7 @@ from src.application.domain.models import (
 )
 from src.application.domain.utils import UserTypes
 from src.infrastructure.repositories import AuthRepository, AdminRepository
+from src.utils import settings
 import bcrypt
 
 
@@ -25,7 +26,7 @@ class AdminService:
             )
         )
         admin.password = bcrypt.hashpw(
-            admin.password.encode(), bcrypt.gensalt(13)
+            admin.password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
         auth = AuthModel(
             **{

@@ -8,6 +8,7 @@ from src.application.domain.models import (
 from src.application.domain.utils import UserTypes
 from src.application.port import ReaderInterface
 from src.infrastructure.repositories import AuthRepository, ReaderRepository
+from src.utils import settings
 import bcrypt
 
 
@@ -24,7 +25,7 @@ class ReaderService:
             )
         )
         reader.password = bcrypt.hashpw(
-            reader.password.encode(), bcrypt.gensalt(13)
+            reader.password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
         auth = AuthModel(
             **{
