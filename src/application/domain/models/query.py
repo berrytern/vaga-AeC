@@ -1,7 +1,7 @@
-from typing import Optional, List, Union
+from typing import Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, root_validator, StrictStr
 from pydantic.class_validators import validator
-from ..utils import TypeOp, TypeOpDate
+from ..utils import TypeOpDate
 from datetime import timedelta
 
 
@@ -10,8 +10,8 @@ class QueryModel(BaseModel):
     limit: int = Field(100)
     sort: str = Field("created_at")
     sort_direction: int = Field(1)
-    created_at: Optional[List[Union[TypeOpDate, StrictStr]]] = None
-    updated_at: Optional[List[Union[TypeOpDate, StrictStr]]] = None
+    created_at: Optional[Union[TypeOpDate, StrictStr]] = None
+    updated_at: Optional[Union[TypeOpDate, StrictStr]] = None
 
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
@@ -48,18 +48,7 @@ class QueryModel(BaseModel):
         temp = cls.model_dump(
             by_alias=True, exclude={"page", "limit", "sort", "sort_direction"}
         )
-        query = {"query": {}}
-        for i in temp:
-            if isinstance(temp[i], list):
-                query_op = {
-                    "$" + n.op: n.value for n in temp[i] if isinstance(n, TypeOp) and n
-                }
-                if query_op:
-                    query["query"][i] = query_op
-                else:
-                    query["query"][i] = temp[i][0]
-            elif temp[i] is not None:
-                query["query"][i] = temp[i]
+        query = {"query": {i: temp[i] for i in temp if temp[i] is not None}}
         return {
             **query,
             **cls.model_dump(

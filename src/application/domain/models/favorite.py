@@ -1,4 +1,4 @@
-from .query_model import QueryModel
+from .query import QueryModel
 from datetime import datetime
 from typing import Optional, List
 from pydantic import (

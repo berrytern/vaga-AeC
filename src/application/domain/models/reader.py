@@ -1,7 +1,6 @@
-from typing import Optional, List, Union
-from .credential_model import CreateAuthModel
-from .query_model import QueryModel
-from src.application.domain.utils import TypeOpStr, TypeOpDate
+from typing import Optional, List
+from .credential import CreateAuthModel
+from .query import QueryModel
 from pydantic import (
     BaseModel,
     RootModel,
@@ -76,6 +75,6 @@ class ReaderList(RootModel):
 
 
 class ReaderQueryModel(QueryModel):
-    id: Optional[List[UUID]] = None
-    name: Optional[List[Union[TypeOpStr, StrictStr]]] = None
-    birthday: Optional[List[Union[TypeOpDate, StrictStr]]] = None
+    id: Optional[UUID] = None
+    name: Optional[StrictStr] = None
+    birthday: Optional[StrictStr] = None
