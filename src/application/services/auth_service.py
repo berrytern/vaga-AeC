@@ -1,4 +1,8 @@
-from src.application.domain.models import CredentialModel, RefreshCredentialModel
+from src.application.domain.models import (
+    CredentialModel,
+    RefreshCredentialModel,
+    ResetCredentialModel,
+)
 from src.application.domain.utils import UserTypes, UserScopes
 from src.infrastructure.cache import RedisClient
 from src.infrastructure.repositories import AuthRepository
@@ -6,13 +10,15 @@ from src.presenters.exceptions import UnauthorizedException
 from src.utils import settings, default
 from http import HTTPStatus
 from datetime import datetime, timedelta
+from aiosmtplib import SMTP
 import bcrypt
 import jwt
 
 
 class AuthService:
-    def __init__(self, repository: AuthRepository) -> None:
+    def __init__(self, repository: AuthRepository, email_client: SMTP) -> None:
         self.repository = repository
+        self.email_client = email_client
 
     @staticmethod
     def _getScopeByUserType(type: str):
@@ -113,3 +119,7 @@ class AuthService:
             },
         )
         return response
+
+    async def change_password(self, data: ResetCredentialModel):
+        self.email_client
+        return None
