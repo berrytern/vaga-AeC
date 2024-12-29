@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, Mock, MagicMock, patch
-from src.main.middlewares import authenticate_middleware
+from src.main.middlewares import auth_middleware
 from tests.unit.mocks.auth_payload import (
     ADMIN_PAYLOAD,
     ADMIN_SCOPE,
@@ -41,15 +41,15 @@ async def test_auth_middleware(request_mock, payload, scope):
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth_middleware.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth_middleware.settings.JWT_SECRET", jwt_secret
+    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
+        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
     ), patch(
-        "src.main.middlewares.auth_middleware.jwt.decode", return_value=payload
+        "src.main.middlewares.auth.jwt.decode", return_value=payload
     ) as decode_mock:
-        assert callable(authenticate_middleware)
-        assert callable(authenticate_middleware(scope))
-        assert callable(authenticate_middleware(scope)(next_mock))
-        middleware = authenticate_middleware(scope)(next_mock)
+        assert callable(auth_middleware)
+        assert callable(auth_middleware(scope))
+        assert callable(auth_middleware(scope)(next_mock))
+        middleware = auth_middleware(scope)(next_mock)
         response = await middleware(request=request_mock)
         request_mock.headers.get.assert_called_with("Authorization")
         decode_mock.assert_called_with(
@@ -90,16 +90,16 @@ async def test_auth_middleware_with_revoked_token(request_mock, payload, scope):
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth_middleware.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth_middleware.settings.JWT_SECRET", jwt_secret
+    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
+        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
     ), patch(
-        "src.main.middlewares.auth_middleware.jwt.decode", return_value=payload
+        "src.main.middlewares.auth.jwt.decode", return_value=payload
     ) as decode_mock:
-        assert callable(authenticate_middleware)
-        assert callable(authenticate_middleware(scope))
-        assert callable(authenticate_middleware(scope)(next_mock))
+        assert callable(auth_middleware)
+        assert callable(auth_middleware(scope))
+        assert callable(auth_middleware(scope)(next_mock))
         with pytest.raises(HTTPException) as exc_info:
-            middleware = authenticate_middleware(scope)(next_mock)
+            middleware = auth_middleware(scope)(next_mock)
             await middleware(request=request_mock)
         # Test failure cases
         assert exc_info.value.status_code == 401
@@ -137,15 +137,15 @@ async def test_auth_middleware_without_permission(request_mock, payload, scope):
     async def next_mock(*args, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth_middleware.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth_middleware.settings.JWT_SECRET", jwt_secret
+    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
+        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
     ), patch(
-        "src.main.middlewares.auth_middleware.jwt.decode", return_value=payload
+        "src.main.middlewares.auth.jwt.decode", return_value=payload
     ) as decode_mock:
-        assert callable(authenticate_middleware)
-        assert callable(authenticate_middleware(scope))
-        assert callable(authenticate_middleware(scope)(next_mock))
-        middleware = authenticate_middleware(scope)(next_mock)
+        assert callable(auth_middleware)
+        assert callable(auth_middleware(scope))
+        assert callable(auth_middleware(scope)(next_mock))
+        middleware = auth_middleware(scope)(next_mock)
         with pytest.raises(HTTPException) as exc_info:
             await middleware(request=request_mock)
         request_mock.headers.get.assert_called_with("Authorization")
@@ -168,11 +168,11 @@ async def test_auth_middleware_with_invalid_jwt_secret(request_mock):
     async def next_mock(*args, **kwargs):
         return ""
 
-    with patch("src.main.middlewares.auth_middleware.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth_middleware.jwt.decode",
+    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
+        "src.main.middlewares.auth.jwt.decode",
         side_effect=PyJWTError("Invalid signature"),
     ):
-        middleware = authenticate_middleware("admin")(next_mock)
+        middleware = auth_middleware("admin")(next_mock)
 
         with pytest.raises(HTTPException) as exc_info:
             await middleware(request=request_mock)
@@ -198,15 +198,13 @@ async def test_auth_middleware_without_authorization_header(request_mock):
     async def next_mock(*args, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth_middleware.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth_middleware.settings.JWT_SECRET", jwt_secret
-    ), patch(
-        "src.main.middlewares.auth_middleware.jwt.decode", return_value=token
-    ) as decode_mock:
-        assert callable(authenticate_middleware)
-        assert callable(authenticate_middleware(scope))
-        assert callable(authenticate_middleware(scope)(next_mock))
-        middleware = authenticate_middleware(scope)(next_mock)
+    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
+        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
+    ), patch("src.main.middlewares.auth.jwt.decode", return_value=token) as decode_mock:
+        assert callable(auth_middleware)
+        assert callable(auth_middleware(scope))
+        assert callable(auth_middleware(scope)(next_mock))
+        middleware = auth_middleware(scope)(next_mock)
         with pytest.raises(HTTPException) as exc_info:
             await middleware(request=request_mock)
         request_mock.headers.get.assert_called_with("Authorization")

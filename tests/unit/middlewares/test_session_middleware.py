@@ -16,9 +16,7 @@ async def test_session_middleware(request_mock):
         return excepted_answer
 
     # Mock get_db to return our session mock
-    with patch(
-        "src.main.middlewares.session_middleware.get_db", return_value=db_session_mock
-    ):
+    with patch("src.main.middlewares.session.get_db", return_value=db_session_mock):
         # Verify that the middleware is a callable function
         assert callable(session_middleware)
         assert callable(session_middleware(next_mock))
@@ -44,9 +42,7 @@ async def test_session_middleware_error_handling(request_mock):
     async def next_mock(request, *args, **kwargs):
         raise ValueError("Test error")
 
-    with patch(
-        "src.main.middlewares.session_middleware.get_db", return_value=db_session_mock
-    ):
+    with patch("src.main.middlewares.session.get_db", return_value=db_session_mock):
         middleware = session_middleware(next_mock)
 
         with pytest.raises(ValueError, match="Test error"):

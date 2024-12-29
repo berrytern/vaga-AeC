@@ -9,7 +9,7 @@ from src.application.domain.models import (
 )
 from src.di import DI
 from src.main.middlewares import (
-    authenticate_middleware,
+    auth_middleware,
     cache_middleware,
     rate_limit_middleware,
     session_middleware,
@@ -21,7 +21,7 @@ READER_ROUTER = APIRouter()
 
 @READER_ROUTER.post("/", response_model=ReaderModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("rd:c")
+@auth_middleware("rd:c")
 @session_middleware
 async def create_new_reader(request: Request, reader: CreateReaderModel):
     response = await DI.reader_controller(request.state.db_session).create(reader)
@@ -32,7 +32,7 @@ async def create_new_reader(request: Request, reader: CreateReaderModel):
 
 @READER_ROUTER.get("/", response_model=ReaderList)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("rd:ra")
+@auth_middleware("rd:ra")
 @cache_middleware(5)
 @session_middleware
 async def get_all_readers(request: Request):
@@ -47,7 +47,7 @@ async def get_all_readers(request: Request):
 
 @READER_ROUTER.get("/{reader_id}", response_model=ReaderModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("rd:r", "reader_id")
+@auth_middleware("rd:r", "reader_id")
 @cache_middleware(5)
 @session_middleware
 async def get_one_reader(request: Request, reader_id: UUID):
@@ -59,7 +59,7 @@ async def get_one_reader(request: Request, reader_id: UUID):
 
 @READER_ROUTER.put("/{reader_id}", response_model=ReaderModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("rd:u", "reader_id")
+@auth_middleware("rd:u", "reader_id")
 @session_middleware
 async def update_reader_info(
     request: Request, reader_id: UUID, reader: UpdateReaderModel
@@ -74,7 +74,7 @@ async def update_reader_info(
 
 @READER_ROUTER.delete("/{reader_id}", response_model=bool)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("rd:d", "reader_id")
+@auth_middleware("rd:d", "reader_id")
 @session_middleware
 async def delete_reader_info(request: Request, reader_id: UUID):
     response = await DI.reader_controller(request.state.db_session).delete_one(

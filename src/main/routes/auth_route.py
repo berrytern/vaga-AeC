@@ -10,7 +10,7 @@ from src.application.services import AuthService
 from src.di import DI
 from src.infrastructure.cache import RedisClient
 from src.main.middlewares import (
-    authenticate_middleware,
+    auth_middleware,
     rate_limit_middleware,
     session_middleware,
 )
@@ -57,7 +57,7 @@ async def revoke_token(data: RevokeCredentialModel):
 
 
 @AUTH_ROUTER.post("/users/{user_id}/change-password")
-@authenticate_middleware("us:u", "user_id")
+@auth_middleware("us:u", "user_id")
 @rate_limit_middleware(2, 5 * 60)
 async def change_password(request: Request, data: ResetCredentialModel, user_id: UUID):
     response = await DI.auth_controller(request.state.db_session).change_password(

@@ -9,7 +9,7 @@ from src.application.domain.models import (
 )
 from src.di import DI
 from src.main.middlewares import (
-    authenticate_middleware,
+    auth_middleware,
     cache_middleware,
     rate_limit_middleware,
     session_middleware,
@@ -21,7 +21,7 @@ BOOK_ROUTER = APIRouter()
 
 @BOOK_ROUTER.post("/", response_model=BookModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("bk:c")
+@auth_middleware("bk:c")
 @session_middleware
 async def create_new_book(request: Request, book: CreateBookModel):
     response = await DI.book_controller(request.state.db_session).create(book)
@@ -32,7 +32,7 @@ async def create_new_book(request: Request, book: CreateBookModel):
 
 @BOOK_ROUTER.get("/", response_model=BookList)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("bk:ra")
+@auth_middleware("bk:ra")
 @cache_middleware(5)
 @session_middleware
 async def get_all_books(request: Request):
@@ -47,7 +47,7 @@ async def get_all_books(request: Request):
 
 @BOOK_ROUTER.get("/{book_id}", response_model=BookModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("bk:r")
+@auth_middleware("bk:r")
 @cache_middleware(5)
 @session_middleware
 async def get_one_book(request: Request, book_id: UUID):
@@ -59,7 +59,7 @@ async def get_one_book(request: Request, book_id: UUID):
 
 @BOOK_ROUTER.put("/{book_id}", response_model=BookModel)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("bk:u")
+@auth_middleware("bk:u")
 @session_middleware
 async def update_book_info(request: Request, book_id: UUID, book: UpdateBookModel):
     response = await DI.book_controller(request.state.db_session).update_one(
@@ -72,7 +72,7 @@ async def update_book_info(request: Request, book_id: UUID, book: UpdateBookMode
 
 @BOOK_ROUTER.delete("/{book_id}", response_model=bool)
 @rate_limit_middleware(5, 60)
-@authenticate_middleware("bk:d")
+@auth_middleware("bk:d")
 @session_middleware
 async def delete_book_info(request: Request, book_id: UUID):
     response = await DI.book_controller(request.state.db_session).delete_one(book_id)
