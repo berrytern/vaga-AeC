@@ -18,6 +18,12 @@ SSL_CA_PATH = os.getenv("SSL_CA_PATH")
 SSL_KEY_PATH = os.getenv("SSL_KEY_PATH")
 SSL_CERT_PATH = os.getenv("SSL_CERT_PATH")
 
+# Define the SMTP server settings
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+SMTP_USER = os.getenv("SMTP_USER", "berrytern@gmail.com")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+
 # Define the issuer for the JWT
 ISSUER = os.getenv("ISSUER", "berrytern")
 # Define admin's username and password
