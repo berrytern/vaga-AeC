@@ -130,6 +130,4 @@ class AuthService:
         new_password = bcrypt.hashpw(
             data.new_password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
-        return await self.repository.update_one(
-            user_id, {"password": new_password}
-        )
+        return await self.repository.update_one(user_id, {"password": new_password})
