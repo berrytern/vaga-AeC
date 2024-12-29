@@ -11,6 +11,7 @@ from src.utils import settings, default
 from http import HTTPStatus
 from datetime import datetime, timedelta
 from aiosmtplib import SMTP
+from uuid import UUID
 import bcrypt
 import jwt
 
@@ -120,6 +121,15 @@ class AuthService:
         )
         return response
 
-    async def change_password(self, data: ResetCredentialModel):
-        self.email_client
-        return None
+    async def change_password(self, data: ResetCredentialModel, user_id: UUID):
+        result = await self.repository.get_one({"foreign_id": user_id})
+        if not bcrypt.checkpw(data.old_password.encode(), result["password"].encode()):
+            raise UnauthorizedException(
+                HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
+            )
+        new_password = bcrypt.hashpw(
+            data.new_password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
+        ).decode()
+        return await self.repository.update_one(
+            user_id, {"password": new_password}
+        )
