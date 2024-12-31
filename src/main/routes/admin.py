@@ -11,12 +11,19 @@ from src.application.services import AdminService
 from src.infrastructure.database.schemas import AdminSchema
 from src.infrastructure.repositories import AdminRepository, AuthRepository
 from src.presenters.controllers import AdminController
-from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
+from src.main.middlewares import (
+    auth_middleware,
+    cache_middleware,
+    rate_limit_middleware,
+    session_middleware,
+)
+from uuid import UUID
 
 ADMIN_ROUTER = APIRouter()
 
 
 @ADMIN_ROUTER.post("/", response_model=AdminModel)
+@rate_limit_middleware(2, 60)
 @auth_middleware("ad:c")
 @session_middleware
 async def create_new_admin(request: Request, admin: CreateAdminModel):
@@ -32,6 +39,7 @@ async def create_new_admin(request: Request, admin: CreateAdminModel):
 
 
 @ADMIN_ROUTER.get("/", response_model=AdminList)
+@rate_limit_middleware(2, 60)
 @auth_middleware("ad:ra")
 @cache_middleware(5)
 @session_middleware
@@ -51,10 +59,11 @@ async def get_all_admins(request: Request):
 
 
 @ADMIN_ROUTER.get("/{admin_id}", response_model=AdminModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("ad:r")
 @cache_middleware(5)
 @session_middleware
-async def get_one_admin(request: Request, admin_id: str):
+async def get_one_admin(request: Request, admin_id: UUID):
     repository = AdminRepository(
         request.state.db_session, AdminSchema, AdminModel, AdminList
     )
@@ -67,9 +76,10 @@ async def get_one_admin(request: Request, admin_id: str):
 
 
 @ADMIN_ROUTER.put("/{admin_id}", response_model=AdminModel)
+@rate_limit_middleware(2, 60)
 @auth_middleware("ad:u")
 @session_middleware
-async def update_admin_info(request: Request, admin_id: str, admin: UpdateAdminModel):
+async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdminModel):
     repository = AdminRepository(
         request.state.db_session, AdminSchema, AdminModel, AdminList
     )
@@ -82,9 +92,10 @@ async def update_admin_info(request: Request, admin_id: str, admin: UpdateAdminM
 
 
 @ADMIN_ROUTER.delete("/{admin_id}", response_model=bool)
+@rate_limit_middleware(2, 60)
 @auth_middleware("ad:d")
 @session_middleware
-async def delete_admin_info(request: Request, admin_id: str):
+async def delete_admin_info(request: Request, admin_id: UUID):
     repository = AdminRepository(
         request.state.db_session, AdminSchema, AdminModel, AdminList
     )

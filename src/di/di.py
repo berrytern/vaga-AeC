@@ -21,6 +21,7 @@ from src.infrastructure.database.schemas import (
     FavoriteBookSchema,
     ReaderSchema,
 )
+from src.infrastructure.email import EmailClient
 from src.infrastructure.repositories import (
     AuthRepository,
     AdminRepository,
@@ -35,13 +36,16 @@ from src.presenters.controllers import (
     ReaderController,
     FavoriteController,
 )
+from src.utils import settings
 
 
 class DI:
+    __email_client = EmailClient(settings.SMTP_HOST, settings.SMTP_PORT, settings.SMTP_USER, settings.SMTP_PASSWORD)
+
     @classmethod
     def auth_controller(cls, db_session) -> AuthController:
         repository = AuthRepository(db_session)
-        service = AuthService(repository)
+        service = AuthService(repository, cls.__email_client)
         return AuthController(service)
 
     @classmethod

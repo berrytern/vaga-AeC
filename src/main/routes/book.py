@@ -8,12 +8,19 @@ from src.application.domain.models import (
     BookList,
 )
 from src.di import DI
-from src.main.middlewares import auth_middleware, cache_middleware, session_middleware
+from src.main.middlewares import (
+    auth_middleware,
+    cache_middleware,
+    rate_limit_middleware,
+    session_middleware,
+)
+from uuid import UUID
 
 BOOK_ROUTER = APIRouter()
 
 
 @BOOK_ROUTER.post("/", response_model=BookModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("bk:c")
 @session_middleware
 async def create_new_book(request: Request, book: CreateBookModel):
@@ -24,6 +31,7 @@ async def create_new_book(request: Request, book: CreateBookModel):
 
 
 @BOOK_ROUTER.get("/", response_model=BookList)
+@rate_limit_middleware(5, 60)
 @auth_middleware("bk:ra")
 @cache_middleware(5)
 @session_middleware
@@ -38,10 +46,11 @@ async def get_all_books(request: Request):
 
 
 @BOOK_ROUTER.get("/{book_id}", response_model=BookModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("bk:r")
 @cache_middleware(5)
 @session_middleware
-async def get_one_book(request: Request, book_id: str):
+async def get_one_book(request: Request, book_id: UUID):
     response = await DI.book_controller(request.state.db_session).get_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
@@ -49,9 +58,10 @@ async def get_one_book(request: Request, book_id: str):
 
 
 @BOOK_ROUTER.put("/{book_id}", response_model=BookModel)
+@rate_limit_middleware(5, 60)
 @auth_middleware("bk:u")
 @session_middleware
-async def update_book_info(request: Request, book_id: str, book: UpdateBookModel):
+async def update_book_info(request: Request, book_id: UUID, book: UpdateBookModel):
     response = await DI.book_controller(request.state.db_session).update_one(
         book_id, book
     )
@@ -61,9 +71,10 @@ async def update_book_info(request: Request, book_id: str, book: UpdateBookModel
 
 
 @BOOK_ROUTER.delete("/{book_id}", response_model=bool)
+@rate_limit_middleware(5, 60)
 @auth_middleware("bk:d")
 @session_middleware
-async def delete_book_info(request: Request, book_id: str):
+async def delete_book_info(request: Request, book_id: UUID):
     response = await DI.book_controller(request.state.db_session).delete_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]

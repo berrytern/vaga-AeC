@@ -1,5 +1,5 @@
 from typing import Optional, List
-from .query_model import QueryModel
+from .query import QueryModel
 from pydantic import (
     BaseModel,
     RootModel,
@@ -71,10 +71,3 @@ class BookQueryModel(QueryModel):
     title: Optional[StrictStr] = None
     description: Optional[StrictStr] = None
     price: Optional[float] = None
-
-    @staticmethod
-    def integrate_regex(text: str) -> str:
-        # text = f"^{text}" if text[0] != ["*"] else text.replace("*", ".*", 1)
-        # text = f"{text}$" if text[-1] != ["*"] else text.replace("*", ".*", 1)
-
-        return text  # .replace("*", ".*")

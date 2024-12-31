@@ -1,6 +1,6 @@
 from typing import Optional, List
-from .credential_model import CreateAuthModel
-from .query_model import QueryModel
+from .credential import CreateAuthModel
+from .query import QueryModel
 from pydantic import (
     BaseModel,
     RootModel,

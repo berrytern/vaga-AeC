@@ -1,9 +1,8 @@
-from typing import List
 from enum import Enum
 
 
 class UserScopes(Enum):
-    ADMIN: List[str] = [
+    ADMIN = [
         "ad:c",
         "ad:ra",
         "ad:r",
@@ -22,7 +21,7 @@ class UserScopes(Enum):
         "bkf:r",
         "bkf:d",  # Favorite
     ]
-    READER: List[str] = [
+    READER = [
         "rd:r",
         "rd:u",
         "rd:d",  # Reader

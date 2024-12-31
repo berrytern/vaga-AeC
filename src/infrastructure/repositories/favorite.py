@@ -1,5 +1,5 @@
 from typing import Type, Optional, Dict, Any
-from .reader_repository import ReaderRepository
+from .reader import ReaderRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from json import loads

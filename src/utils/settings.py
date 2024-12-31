@@ -17,6 +17,13 @@ HTTPS_PORT = int(os.getenv("HTTPS_PORT", "8001"))
 SSL_CA_PATH = os.getenv("SSL_CA_PATH")
 SSL_KEY_PATH = os.getenv("SSL_KEY_PATH")
 SSL_CERT_PATH = os.getenv("SSL_CERT_PATH")
+HOSTNAME = os.getenv("HOSTNAME", f"localhost:{HTTPS_PORT}")
+
+# Define the SMTP server settings
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+SMTP_USER = os.getenv("SMTP_USER", "berrytern@gmail.com")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 # Define the issuer for the JWT
 ISSUER = os.getenv("ISSUER", "berrytern")
@@ -25,6 +32,8 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 # Define the password salt rounds
 PASSWORD_SALT_ROUNDS = int(os.getenv("PASSWORD_SALT_ROUNDS", "12"))
+# Define the reset password expiration time
+RESET_PASSWD_EXP = int(os.getenv("RESET_PASSWD_EXP", "600"))
 # Define JWT secret
 JWT_SECRET = os.getenv("JWT_SECRET")
 # Define database URL

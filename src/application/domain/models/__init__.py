@@ -1,32 +1,34 @@
-from .admin_model import (
+from .admin import (
     CreateAdminModel,
     UpdateAdminModel,
     AdminModel,
     AdminList,
     AdminQueryModel,
 )
-from .auth_model import AuthModel
-from .book_model import (
+from .auth import AuthModel
+from .book import (
     CreateBookModel,
     UpdateBookModel,
     BookModel,
     BookList,
     BookQueryModel,
 )
-from .credential_model import (
+from .credential import (
     CreateAuthModel,
     CredentialModel,
     RefreshCredentialModel,
     RevokeCredentialModel,
     ResetCredentialModel,
+    RecoverRequestModel,
+    RecoverPasswordModel,
 )
-from .favorite_model import (
+from .favorite import (
     CreateFavoriteModel,
     FavoriteModel,
     FavoriteList,
     FavoriteQueryModel,
 )
-from .reader_model import (
+from .reader import (
     CreateReaderModel,
     UpdateReaderModel,
     ReaderModel,
@@ -51,6 +53,8 @@ __all__ = [
     "RefreshCredentialModel",
     "RevokeCredentialModel",
     "ResetCredentialModel",
+    "RecoverRequestModel",
+    "RecoverPasswordModel",
     "CreateFavoriteModel",
     "FavoriteModel",
     "FavoriteList",

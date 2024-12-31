@@ -1,8 +1,8 @@
-from .admin_repository import AdminRepository
-from .auth_repository import AuthRepository
-from .book_repository import BookRepository
-from .favorite_repository import FavoriteRepository
-from .reader_repository import ReaderRepository
+from .admin import AdminRepository
+from .auth import AuthRepository
+from .book import BookRepository
+from .favorite import FavoriteRepository
+from .reader import ReaderRepository
 
 __all__ = [
     "AdminRepository",

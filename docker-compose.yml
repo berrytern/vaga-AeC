@@ -12,6 +12,11 @@ services:
       - SSL_CA_PATH=${SSL_CA_PATH}
       - SSL_KEY_PATH=${SSL_KEY_PATH}
       - SSL_CERT_PATH=${SSL_CERT_PATH}
+      - HOSTNAME=${BACKEND_HOSTNAME}
+      - SMTP_HOST=${EMAIL_HOST}
+      - SMTP_PORT=${EMAIL_PORT}
+      - SMTP_USER=${EMAIL_LOGIN}
+      - SMTP_PASSWORD=${EMAIL_PASSWORD}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - EMAIL_LOGIN=${EMAIL_LOGIN}
@@ -27,6 +32,7 @@ services:
       - ${HTTP_PORT}:${HTTP_PORT}
       - ${HTTPS_PORT}:${HTTPS_PORT}
     networks:
+      - aec-back-network
       - aec-postgres-network
       - aec-prometheus-network
       - aec-redis-network
@@ -54,8 +60,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -99,10 +103,6 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
     container_name: cadvisor
@@ -144,6 +144,9 @@ volumes:
   redis_data:
 
 networks:
+  aec-back-network:
+    name: aec-back-network
+    driver: bridge
   aec-prometheus-network:
     name: aec-prometheus-network
     driver: bridge
