@@ -14,13 +14,17 @@ from src.main.middlewares import (
     rate_limit_middleware,
     session_middleware,
 )
+from src.utils import settings
 from fastapi import Request, APIRouter
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
 from datetime import datetime
 from uuid import UUID
 
 
 AUTH_ROUTER = APIRouter()
+
+templates = Jinja2Templates(directory="templates")
 
 
 @AUTH_ROUTER.post("/login", response_model=RefreshCredentialModel)
@@ -70,6 +74,7 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
 
 @AUTH_ROUTER.post("/password/reset-request")
 @rate_limit_middleware(1, 10 * 60)
+@session_middleware
 async def request_password_reset(request: Request, data: RecoverRequestModel):
     response = await DI.auth_controller(
         request.state.db_session
@@ -81,8 +86,26 @@ async def request_password_reset(request: Request, data: RecoverRequestModel):
 
 @AUTH_ROUTER.post("/password/reset")
 @rate_limit_middleware(1, 60)
+@session_middleware
 async def reset_password(request: Request, data: RecoverPasswordModel):
     response = await DI.auth_controller(request.state.db_session).reset_password(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
+
+
+@AUTH_ROUTER.get(
+    "/password/username/{username}/hash/{hash}", response_class=HTMLResponse
+)
+@rate_limit_middleware(2, settings.RESET_PASSWD_EXP)
+async def get_password_reset_page(request: Request, username: str, hash: str):
+    return templates.TemplateResponse(
+        request=request,
+        name="reset_password.html",
+        context={"username": username, "hash": hash},
+    )
+
+
+@AUTH_ROUTER.get("/password/reset/success", response_class=HTMLResponse)
+async def success_page(request: Request):
+    return templates.TemplateResponse(request=request, name="reset_success.html")

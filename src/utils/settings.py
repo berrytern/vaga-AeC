@@ -17,6 +17,7 @@ HTTPS_PORT = int(os.getenv("HTTPS_PORT", "8001"))
 SSL_CA_PATH = os.getenv("SSL_CA_PATH")
 SSL_KEY_PATH = os.getenv("SSL_KEY_PATH")
 SSL_CERT_PATH = os.getenv("SSL_CERT_PATH")
+HOSTNAME = os.getenv("HOSTNAME", f"localhost:{HTTPS_PORT}")
 
 # Define the SMTP server settings
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
