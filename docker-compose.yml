@@ -12,6 +12,7 @@ services:
       - SSL_CA_PATH=${SSL_CA_PATH}
       - SSL_KEY_PATH=${SSL_KEY_PATH}
       - SSL_CERT_PATH=${SSL_CERT_PATH}
+      - HOSTNAME=${BACKEND_HOSTNAME}
       - SMTP_HOST=${EMAIL_HOST}
       - SMTP_PORT=${EMAIL_PORT}
       - SMTP_USER=${EMAIL_LOGIN}
@@ -31,6 +32,7 @@ services:
       - ${HTTP_PORT}:${HTTP_PORT}
       - ${HTTPS_PORT}:${HTTPS_PORT}
     networks:
+      - aec-back-network
       - aec-postgres-network
       - aec-prometheus-network
       - aec-redis-network
@@ -142,6 +144,9 @@ volumes:
   redis_data:
 
 networks:
+  aec-back-network:
+    name: aec-back-network
+    driver: bridge
   aec-prometheus-network:
     name: aec-prometheus-network
     driver: bridge
