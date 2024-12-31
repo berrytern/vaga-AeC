@@ -3,7 +3,6 @@ from src.infrastructure.cache import RedisClient
 from fastapi import Request, Response
 from functools import wraps
 from json import loads, dumps
-from starlette.responses import JSONResponse
 
 
 def cache_middleware(expiration_time: int):
@@ -21,7 +20,7 @@ def cache_middleware(expiration_time: int):
                     status_code=cached_response["status_code"],
                     headers=cached_response["headers"],
                 )
-            response: JSONResponse = await next(*args, request=request, **kwargs)
+            response: Response = await next(*args, request=request, **kwargs)
             cached_response = {
                 "body": response.body.decode(),
                 "status_code": response.status_code,
