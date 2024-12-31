@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, Mock, patch
 from src.main.middlewares import rate_limit_middleware
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from random import randint
 from uuid import uuid4
 
 
@@ -81,7 +82,7 @@ async def test_rate_limit_middleware_last_count(request_mock, limit):
     with patch("src.main.middlewares.rate_limit.RedisClient", redis_mock), patch(
         "src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock
     ) as _:
-        wrapper = rate_limit_middleware(limit + 1, 10)
+        wrapper = rate_limit_middleware(limit + 1, randint(1, 300))
         assert callable(rate_limit_middleware)
         assert callable(wrapper)
         assert callable(wrapper(next_mock))
@@ -98,20 +99,33 @@ async def test_rate_limit_middleware_last_count(request_mock, limit):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "limit",
+    "limit,trust_proxy",
     [
-        0,
-        10,
-        100,
+        (0, False),
+        (10, False),
+        (100, False),
+        (0, True),
+        (10, True),
+        (100, True),
     ],
 )
-async def test_rate_limit_middleware_out_of_limit(request_mock, limit):
+async def test_rate_limit_middleware_out_of_limit(
+    request_mock, limit: int, trust_proxy: bool
+):
     redis_mock = Mock()
     redis_mock.get = AsyncMock(return_value=limit)
     redis_mock.set = AsyncMock()
+    request_mock.headers = Mock()
     middleware_instance_id = str(uuid4())
     client_ip = str(uuid4())
-    key = f"limit-{client_ip}{middleware_instance_id}"
+    if trust_proxy:
+        header_client_ip = str(uuid4())
+        request_mock.headers.get = Mock(return_value=header_client_ip)
+    key = (
+        f"limit-{header_client_ip}{middleware_instance_id}"
+        if trust_proxy
+        else f"limit-{client_ip}{middleware_instance_id}"
+    )
     gen_uuid4_mock = Mock(return_value=middleware_instance_id)
     request_mock.client = Mock()
     request_mock.client.host = client_ip
@@ -125,7 +139,7 @@ async def test_rate_limit_middleware_out_of_limit(request_mock, limit):
     with patch("src.main.middlewares.rate_limit.RedisClient", redis_mock), patch(
         "src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock
     ) as _:
-        wrapper = rate_limit_middleware(limit, 10)
+        wrapper = rate_limit_middleware(limit, randint(1, 300), trust_proxy)
         assert callable(rate_limit_middleware)
         assert callable(wrapper)
         assert callable(wrapper(next_mock))
@@ -133,6 +147,8 @@ async def test_rate_limit_middleware_out_of_limit(request_mock, limit):
         response = await middleware(request=request_mock)
 
         assert request_mock.client.host == client_ip
+        if trust_proxy:
+            request_mock.headers.get.assert_called_with("X-Forwarded-For", client_ip)
         redis_mock.get.assert_called_with(key)
         redis_mock.set.assert_not_called()
         redis_mock.setex.assert_not_called()
