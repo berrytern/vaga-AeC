@@ -37,6 +37,14 @@ async def test_create_admin(admin_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == ADMIN_DATA["name"]
+    assert (
+        result["created_at"]
+        == ADMIN_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == ADMIN_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 
@@ -60,6 +68,14 @@ async def test_get_one_admin(admin_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == ADMIN_DATA["name"]
+    assert (
+        result["created_at"]
+        == ADMIN_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == ADMIN_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 
@@ -86,6 +102,14 @@ async def test_get_all_admins(admin_repository, session_mock):
     assert len(result) == 1
     assert result[0]["id"] == str(ADMIN_DATA["id"])
     assert result[0]["name"] == ADMIN_DATA["name"]
+    assert (
+        result[0]["created_at"]
+        == ADMIN_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result[0]["updated_at"]
+        == ADMIN_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.stream_scalars.assert_called_once()
 
 
@@ -112,6 +136,14 @@ async def test_update_one_admin(admin_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(ADMIN_DATA["id"])
     assert result["name"] == "Updated Admin"
+    assert (
+        result["created_at"]
+        == ADMIN_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == ADMIN_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 

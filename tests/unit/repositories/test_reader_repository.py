@@ -47,6 +47,14 @@ async def test_create_reader(reader_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
+    assert (
+        result["created_at"]
+        == READER_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == READER_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
     mock_result.fetchone.assert_called_once()
 
@@ -72,6 +80,14 @@ async def test_get_one_reader(reader_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == READER_DATA["name"]
+    assert (
+        result["created_at"]
+        == READER_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == READER_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 
@@ -98,6 +114,14 @@ async def test_get_all_readers(reader_repository, session_mock):
     assert len(result) == 1
     assert result[0]["id"] == str(READER_DATA["id"])
     assert result[0]["name"] == READER_DATA["name"]
+    assert (
+        result[0]["created_at"]
+        == READER_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result[0]["updated_at"]
+        == READER_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.stream_scalars.assert_called_once()
 
 
@@ -125,6 +149,14 @@ async def test_update_one_reader(reader_repository, session_mock):
     # Assertions
     assert result["id"] == str(READER_DATA["id"])
     assert result["name"] == "Jane Doe"
+    assert (
+        result["created_at"]
+        == READER_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == READER_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 
@@ -155,6 +187,14 @@ async def test_update_books_read_count(reader_repository, session_mock):
     assert isinstance(result, dict)
     assert result["id"] == str(READER_DATA["id"])
     assert result["books_read_count"] == updated_count
+    assert (
+        result["created_at"]
+        == READER_DATA["created_at"].replace(microsecond=0).isoformat() + "Z"
+    )
+    assert (
+        result["updated_at"]
+        == READER_DATA["updated_at"].replace(microsecond=0).isoformat() + "Z"
+    )
     session_mock.execute.assert_called_once()
 
 
