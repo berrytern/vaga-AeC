@@ -31,8 +31,7 @@ RESET_PASSWD_BODY_HTML = """\
             <br/><b>If you have not asked for a password reset, please ignore this e-mail.</b>
             <br/><br/>
             Should you have any questions, always feel free to contact our
-             <a href="mailto:{support_email}?subject=Support Me to Recover Access to My Account&
-            body=Hi, I am failling to recover my password. Please, Help me!">support team</a>.
+             <a href="mailto:{support_email}?subject=Support Me to Recover Access to My Account&body=Hi, I am failling to recover my password. Please, Help me!">support team</a>.
             <br/><br/>
             Best regards,
             <br/><br/>
@@ -40,4 +39,4 @@ RESET_PASSWD_BODY_HTML = """\
         </p>
     </body>
 </html>
-"""
+"""  # noqa: E501
