@@ -11,6 +11,7 @@ from src.di import DI
 from src.infrastructure.cache import RedisClient
 from src.main.middlewares import (
     auth_middleware,
+    CORSMiddleware,
     rate_limit_middleware,
     session_middleware,
 )
@@ -24,10 +25,16 @@ from uuid import UUID
 
 AUTH_ROUTER = APIRouter()
 
+router_cors = CORSMiddleware(AUTH_ROUTER, "*")
+
 templates = Jinja2Templates(directory="templates")
 
 
-@AUTH_ROUTER.post("/login", response_model=RefreshCredentialModel)
+@(
+    router_cors.set_path("login")
+    .allow_header("Content-Type")
+    .post(response_model=RefreshCredentialModel)
+)
 @rate_limit_middleware(5, 5 * 60)
 @session_middleware
 async def login(request: Request, data: CredentialModel):
@@ -37,8 +44,13 @@ async def login(request: Request, data: CredentialModel):
     )
 
 
-@AUTH_ROUTER.post("/refresh-token", response_model=RefreshCredentialModel)
+@(
+    router_cors.set_path("refresh-token")
+    .allow_headers("Content-Type", "Authorization")
+    .post(response_model=RefreshCredentialModel)
+)
 @rate_limit_middleware(2, 10 * 60)
+@auth_middleware(None)
 @session_middleware
 async def refresh_token(request: Request, data: RefreshCredentialModel):
     response = await DI.auth_controller(request.state.db_session).refresh_token(data)
@@ -47,8 +59,13 @@ async def refresh_token(request: Request, data: RefreshCredentialModel):
     )
 
 
-@AUTH_ROUTER.post("/revoke-token")
+@(
+    router_cors.set_path("revoke-token")
+    .allow_headers("Content-Type", "Authorization")
+    .post()
+)
 @rate_limit_middleware(2, 60)
+@auth_middleware(None)
 async def revoke_token(data: RevokeCredentialModel):
     if await RedisClient.get(data.access_token):
         return JSONResponse(
@@ -60,7 +77,11 @@ async def revoke_token(data: RevokeCredentialModel):
     return JSONResponse("Token has been revoked")
 
 
-@AUTH_ROUTER.post("/users/{user_id}/change-password")
+@(
+    router_cors.set_path("users/{user_id}/change-password")
+    .allow_headers("Content-Type", "Authorization")
+    .post()
+)
 @auth_middleware(None, "user_id")
 @rate_limit_middleware(2, 5 * 60)
 async def change_password(request: Request, data: ResetCredentialModel, user_id: UUID):
@@ -72,7 +93,11 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
     )
 
 
-@AUTH_ROUTER.post("/password/reset-request")
+@(
+    router_cors.set_path("password/reset-request")
+    .allow_headers(["Content-Type", "Authorization"])
+    .post()
+)
 @rate_limit_middleware(1, 10 * 60)
 @session_middleware
 async def request_password_reset(request: Request, data: RecoverRequestModel):
@@ -84,7 +109,7 @@ async def request_password_reset(request: Request, data: RecoverRequestModel):
     )
 
 
-@AUTH_ROUTER.post("/password/reset")
+@(router_cors.set_path("password/reset").allow_headers(["Content-Type"]).post())
 @rate_limit_middleware(1, 60)
 @session_middleware
 async def reset_password(request: Request, data: RecoverPasswordModel):
@@ -94,8 +119,10 @@ async def reset_password(request: Request, data: RecoverPasswordModel):
     )
 
 
-@AUTH_ROUTER.get(
-    "/password/username/{username}/hash/{hash}", response_class=HTMLResponse
+@(
+    router_cors.set_path("password/username/{username}/hash/{hash}")
+    .allow_header("Content-Type")
+    .get(response_class=HTMLResponse)
 )
 @rate_limit_middleware(2, settings.RESET_PASSWD_EXP)
 async def get_password_reset_page(request: Request, username: str, hash: str):
@@ -106,6 +133,11 @@ async def get_password_reset_page(request: Request, username: str, hash: str):
     )
 
 
-@AUTH_ROUTER.get("/password/reset/success", response_class=HTMLResponse)
+@(
+    router_cors.set_path("password/reset/success")
+    .allow_header("Content-Type")
+    .get(response_class=HTMLResponse)
+)
+@rate_limit_middleware(2, settings.RESET_PASSWD_EXP)
 async def success_page(request: Request):
     return templates.TemplateResponse(request=request, name="reset_success.html")

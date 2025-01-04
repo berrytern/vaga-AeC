@@ -13,7 +13,6 @@ from src.main.routes import (
 from src.utils import settings
 from src.utils.logger import logger
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from contextlib import asynccontextmanager
 
@@ -40,15 +39,6 @@ async def redirect_to_https(request: Request, _):
     )
 
 
-# Add the CORS middleware if needed
-https_app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 # register the track middleware | It can be used to get the graphic of the requests using prometheus + grafana
 register_track_middleware(https_app)
 
