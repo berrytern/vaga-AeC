@@ -8,9 +8,7 @@ if __name__ == "__main__":
 
     p1 = Process(
         target=lambda: uvicorn.run(
-            http_app,
-            host="0.0.0.0",
-            port=settings.HTTP_PORT,
+            http_app, host="0.0.0.0", port=settings.HTTP_PORT, server_header=False
         ),
         args=(),
     )
@@ -21,6 +19,7 @@ if __name__ == "__main__":
             port=settings.HTTPS_PORT,
             ssl_certfile=settings.SSL_CERT_PATH,
             ssl_keyfile=settings.SSL_KEY_PATH,
+            server_header=False,
         ),
         args=(),
     )
