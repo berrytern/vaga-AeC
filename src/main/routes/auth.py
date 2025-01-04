@@ -95,7 +95,7 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
 
 @(
     router_cors.set_path("password/reset-request")
-    .allow_headers(["Content-Type", "Authorization"])
+    .allow_headers("Content-Type", "Authorization")
     .post()
 )
 @rate_limit_middleware(1, 10 * 60)
@@ -109,7 +109,7 @@ async def request_password_reset(request: Request, data: RecoverRequestModel):
     )
 
 
-@(router_cors.set_path("password/reset").allow_headers(["Content-Type"]).post())
+@(router_cors.set_path("password/reset").allow_headers("Content-Type").post())
 @rate_limit_middleware(1, 60)
 @session_middleware
 async def reset_password(request: Request, data: RecoverPasswordModel):

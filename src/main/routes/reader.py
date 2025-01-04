@@ -94,7 +94,7 @@ async def update_reader_info(
 @(
     router_cors.set_path("{reader_id}")
     .allow_headers("Content-Type", "Authorization")
-    .pdeleteut(response_model=bool)
+    .delete(response_model=bool)
 )
 @rate_limit_middleware(5, 60)
 @auth_middleware("rd:d", "reader_id")
