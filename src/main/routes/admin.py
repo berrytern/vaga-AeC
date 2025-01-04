@@ -14,6 +14,7 @@ from src.presenters.controllers import AdminController
 from src.main.middlewares import (
     auth_middleware,
     cache_middleware,
+    CORSMiddleware,
     rate_limit_middleware,
     session_middleware,
 )
@@ -21,8 +22,14 @@ from uuid import UUID
 
 ADMIN_ROUTER = APIRouter()
 
+router_cors = CORSMiddleware(ADMIN_ROUTER, "*")
 
-@ADMIN_ROUTER.post("/", response_model=AdminModel)
+
+@(
+    router_cors.set_path("login")
+    .allow_headers("Content-Type", "Authorization")
+    .post(response_model=AdminModel)
+)
 @rate_limit_middleware(2, 60)
 @auth_middleware("ad:c")
 @session_middleware
@@ -38,7 +45,11 @@ async def create_new_admin(request: Request, admin: CreateAdminModel):
     )
 
 
-@ADMIN_ROUTER.get("/", response_model=AdminList)
+@(
+    router_cors.set_path("")
+    .allow_headers("Content-Type", "Authorization")
+    .get(response_model=AdminList)
+)
 @rate_limit_middleware(2, 60)
 @auth_middleware("ad:ra")
 @cache_middleware(5)
@@ -58,7 +69,11 @@ async def get_all_admins(request: Request):
     )
 
 
-@ADMIN_ROUTER.get("/{admin_id}", response_model=AdminModel)
+@(
+    router_cors.set_path("{admin_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .get(response_model=AdminModel)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("ad:r")
 @cache_middleware(5)
@@ -75,7 +90,11 @@ async def get_one_admin(request: Request, admin_id: UUID):
     )
 
 
-@ADMIN_ROUTER.put("/{admin_id}", response_model=AdminModel)
+@(
+    router_cors.set_path("{admin_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .put(response_model=AdminModel)
+)
 @rate_limit_middleware(2, 60)
 @auth_middleware("ad:u")
 @session_middleware
@@ -91,7 +110,11 @@ async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdmin
     )
 
 
-@ADMIN_ROUTER.delete("/{admin_id}", response_model=bool)
+@(
+    router_cors.set_path("{admin_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .delete(response_model=bool)
+)
 @rate_limit_middleware(2, 60)
 @auth_middleware("ad:d")
 @session_middleware

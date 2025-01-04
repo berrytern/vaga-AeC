@@ -11,6 +11,7 @@ from src.di import DI
 from src.main.middlewares import (
     auth_middleware,
     cache_middleware,
+    CORSMiddleware,
     rate_limit_middleware,
     session_middleware,
 )
@@ -18,8 +19,14 @@ from uuid import UUID
 
 BOOK_ROUTER = APIRouter()
 
+router_cors = CORSMiddleware(BOOK_ROUTER, "*")
 
-@BOOK_ROUTER.post("/", response_model=BookModel)
+
+@(
+    router_cors.set_path("")
+    .allow_headers("Content-Type", "Authorization")
+    .post(response_model=BookModel)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("bk:c")
 @session_middleware
@@ -30,7 +37,11 @@ async def create_new_book(request: Request, book: CreateBookModel):
     )
 
 
-@BOOK_ROUTER.get("/", response_model=BookList)
+@(
+    router_cors.set_path("")
+    .allow_headers("Content-Type", "Authorization")
+    .get(response_model=BookList)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("bk:ra")
 @cache_middleware(5)
@@ -45,7 +56,11 @@ async def get_all_books(request: Request):
     )
 
 
-@BOOK_ROUTER.get("/{book_id}", response_model=BookModel)
+@(
+    router_cors.set_path("{book_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .get(response_model=BookModel)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("bk:r")
 @cache_middleware(5)
@@ -57,7 +72,11 @@ async def get_one_book(request: Request, book_id: UUID):
     )
 
 
-@BOOK_ROUTER.put("/{book_id}", response_model=BookModel)
+@(
+    router_cors.set_path("{book_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .put(response_model=BookModel)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("bk:u")
 @session_middleware
@@ -70,7 +89,11 @@ async def update_book_info(request: Request, book_id: UUID, book: UpdateBookMode
     )
 
 
-@BOOK_ROUTER.delete("/{book_id}", response_model=bool)
+@(
+    router_cors.set_path("{book_id}")
+    .allow_headers("Content-Type", "Authorization")
+    .delete(response_model=bool)
+)
 @rate_limit_middleware(5, 60)
 @auth_middleware("bk:d")
 @session_middleware
