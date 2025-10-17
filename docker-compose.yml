@@ -41,6 +41,19 @@ services:
       options:
         max-size: 100m
 
+  migrations:
+    build: .
+    container_name: aec-migrations
+    command: ["sh", "-c", "python -m alembic upgrade head && python first_setup.py"]
+    environment:
+      - POSTGRES_URL=${POSTGRES_URL}
+    networks:
+      - aec-postgres-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+
   redis:
     image: redis:alpine
     container_name: aec-redis
