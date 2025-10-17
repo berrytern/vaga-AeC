@@ -1,36 +1,52 @@
-FROM python:3.11.2-slim-buster
+# =========================================================================
+# BUILDER STAGE
+# =========================================================================
+FROM python:3.12-slim-trixie as builder
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y build-essential curl && \
-    rm -rf /var/lib/apt/lists/*
+# 1. Install `uv` deterministically.
+COPY --from=ghcr.io/astral-sh/uv:0.6.5 /uv /bin/uv
 
-# Install Poetry and add to PATH
-RUN curl -sSL https://install.python-poetry.org | python3 - && \
-    ln -s /root/.local/bin/poetry /usr/local/bin/poetry
-
-# Configure Poetry
-RUN poetry config virtualenvs.create false
-
-# Set up working directory
+# 2. Set up the working directory.
 WORKDIR /usr/src/app
 
-# Copy Poetry configuration files
-COPY pyproject.toml poetry.lock ./
+# 3. EXPLICITLY CREATE the virtual environment at a known path.
+RUN python -m venv /opt/venv
 
-# Install dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+# 4. ACTIVATE the environment for all subsequent commands.
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Clean up build dependencies
-RUN apt-get purge -y build-essential curl && apt-get autoremove -y
+# 5. Copy dependency files.
+COPY pyproject.toml uv.lock ./
 
-# Copy application code
+# 6. Install dependencies.
+RUN uv sync --no-cache-dir
+
+
+# =========================================================================
+# FINAL STAGE
+# =========================================================================
+FROM python:3.12-slim-trixie as final
+
+# 1. Install essential runtime system dependencies.
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+ && apt-get -y upgrade --no-install-recommends \
+ && apt-get -y install --no-install-recommends wget libsqlite3-0 build-essential libpq-dev  \
+ && rm -rf /var/lib/apt/lists/*
+
+
+# 2. Set the application's working directory.
+WORKDIR /usr/src/app
+
+# 3. Copy the ENTIRE pre-built virtual environment from the builder stage.
+COPY --from=builder /usr/src/app/.venv /opt/venv
+
+# 4. Copy the application source code.
 COPY . .
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# 5. Activate the virtual environment for the runtime.
+ENV PATH="/opt/venv/bin:$PATH"
 
-EXPOSE 8000
-
-# Run the migrations and start the server
-ENTRYPOINT ["/entrypoint.sh"]
+# 6. Define the command to run the application.
+CMD ["python", "./server.py"]
