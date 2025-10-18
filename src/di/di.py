@@ -40,7 +40,12 @@ from src.utils import settings
 
 
 class DI:
-    __email_client = EmailClient(settings.SMTP_HOST, settings.SMTP_PORT, settings.SMTP_USER, settings.SMTP_PASSWORD)
+    __email_client = EmailClient(
+        settings.SMTP_HOST,
+        settings.SMTP_PORT,
+        settings.SMTP_USER,
+        settings.SMTP_PASSWORD,
+    )
 
     @classmethod
     def auth_controller(cls) -> AuthController:
@@ -70,9 +75,7 @@ class DI:
 
     @classmethod
     def reader_favorite_controller(cls) -> FavoriteController:
-        reader_repository = ReaderRepository(
-            ReaderSchema, ReaderModel, ReaderList
-        )
+        reader_repository = ReaderRepository(ReaderSchema, ReaderModel, ReaderList)
         repository = FavoriteRepository(
             FavoriteBookSchema,
             FavoriteModel,

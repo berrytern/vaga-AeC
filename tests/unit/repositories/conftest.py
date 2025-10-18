@@ -37,6 +37,4 @@ def reader_repository(session_mock):
 
 @pytest.fixture
 def admin_repository(session_mock):
-    return AdminRepository(
-        schema=AdminSchema, model=AdminModel, list_model=AdminList
-    )
+    return AdminRepository(schema=AdminSchema, model=AdminModel, list_model=AdminList)

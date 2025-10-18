@@ -34,9 +34,10 @@ async def test_rate_limit_middleware_first_count(request_mock, limit: int, exp: 
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.rate_limit.RedisClient", redis_mock), patch(
-        "src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock
-    ) as _:
+    with (
+        patch("src.main.middlewares.rate_limit.RedisClient", redis_mock),
+        patch("src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock) as _,
+    ):
         wrapper = rate_limit_middleware(limit + 1, exp)
         assert callable(rate_limit_middleware)
         assert callable(wrapper)
@@ -79,9 +80,10 @@ async def test_rate_limit_middleware_last_count(request_mock, limit):
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.rate_limit.RedisClient", redis_mock), patch(
-        "src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock
-    ) as _:
+    with (
+        patch("src.main.middlewares.rate_limit.RedisClient", redis_mock),
+        patch("src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock) as _,
+    ):
         wrapper = rate_limit_middleware(limit + 1, randint(1, 300))
         assert callable(rate_limit_middleware)
         assert callable(wrapper)
@@ -136,9 +138,10 @@ async def test_rate_limit_middleware_out_of_limit(
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.rate_limit.RedisClient", redis_mock), patch(
-        "src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock
-    ) as _:
+    with (
+        patch("src.main.middlewares.rate_limit.RedisClient", redis_mock),
+        patch("src.main.middlewares.rate_limit.uuid4", gen_uuid4_mock) as _,
+    ):
         wrapper = rate_limit_middleware(limit, randint(1, 300), trust_proxy)
         assert callable(rate_limit_middleware)
         assert callable(wrapper)

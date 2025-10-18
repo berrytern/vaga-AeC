@@ -1,3 +1,4 @@
+from typing import Optional
 import re
 from datetime import datetime
 
@@ -28,7 +29,7 @@ class TypeOp:
         return value.find(":")
 
     @classmethod
-    def validate_format(cls, value: str = "", index: int = None):
+    def validate_format(cls, value: str = "", index: Optional[int] = None):
         index = index if index else cls.get_index(value)
         if index == 2 or index == 3:
             return EnumOp.is_operator(value[:index])

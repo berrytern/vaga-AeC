@@ -6,7 +6,6 @@ from src.utils.logger import logger
 from asyncio import run
 
 
-
 async def first_setup():
     async with get_session() as session:
         token = db_session_var.set(session)
@@ -14,5 +13,6 @@ async def first_setup():
         await CreateDefaultAdminTask(repository, logger.background_logger).run()
         await session.commit()
         db_session_var.reset(token)
+
 
 run(first_setup())

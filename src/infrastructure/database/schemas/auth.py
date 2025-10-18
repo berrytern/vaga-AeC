@@ -1,7 +1,7 @@
-import uuid
+from . import Base
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from . import Base
+import uuid
 
 
 class AuthSchema(Base):

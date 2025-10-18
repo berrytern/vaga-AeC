@@ -1,6 +1,12 @@
 from typing import Optional, Union
-from pydantic import BaseModel, ConfigDict, Field, root_validator, StrictStr
-from pydantic.class_validators import validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+    field_validator,
+    StrictStr,
+)
 from ..utils import TypeOpDate
 from datetime import timedelta
 
@@ -15,14 +21,15 @@ class QueryModel(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
-    @root_validator(skip_on_failure=True)
-    def sort_validator(cls, values):
-        if values["sort"][0] == "-":
-            values["sort"] = values["sort"].replace("-", "")
-            values["sort_direction"] = -1
-        return values
+    @model_validator(mode="after")
+    def sort_validator(self):
+        if self.sort[0] == "-":
+            self.sort = self.sort.replace("-", "")
+            self.sort_direction = -1
+        return self
 
-    @validator("created_at", "updated_at")
+    @field_validator("created_at", "updated_at")
+    @classmethod
     def DateOpvalidator(cls, v: str):
         lista = []
         for index in v:
@@ -38,20 +45,29 @@ class QueryModel(BaseModel):
                 raise ValueError("invalid format")
         return lista
 
-    @validator("page", "limit", "sort", "sort_direction", pre=True)
+    @field_validator("page", "limit", "sort", "sort_direction", mode="before")
+    @classmethod
     def sort_conversion(cls, v):
         if isinstance(v, list) and v:
             return v[0]
         return v
 
-    def query_dict(cls):
-        temp = cls.model_dump(
+    def query_dict(self):
+        temp = self.model_dump(
             by_alias=True, exclude={"page", "limit", "sort", "sort_direction"}
         )
-        query = {"query": {i: temp[i] for i in temp if temp[i] is not None}}
+        filters = {"like": {}, "query": {}}
+        for i in temp:
+            if temp[i] is not None:
+                if isinstance(temp[i], str) and (
+                    temp[i][0] == "*" or temp[i][-1] == "*"
+                ):
+                    filters["like"][i] = temp[i].replace("*", "%")
+                else:
+                    filters["query"][i] = temp[i]
         return {
-            **query,
-            **cls.model_dump(
+            **filters,
+            **self.model_dump(
                 by_alias=True, include={"page", "limit", "sort", "sort_direction"}
             ),
         }

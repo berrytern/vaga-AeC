@@ -85,9 +85,7 @@ async def revoke_token(data: RevokeCredentialModel):
 @auth_middleware(None, "user_id")
 @rate_limit_middleware(2, 5 * 60)
 async def change_password(request: Request, data: ResetCredentialModel, user_id: UUID):
-    response = await DI.auth_controller().change_password(
-        data, user_id
-    )
+    response = await DI.auth_controller().change_password(data, user_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -101,9 +99,7 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
 @rate_limit_middleware(1, 10 * 60)
 @session_middleware
 async def request_password_reset(request: Request, data: RecoverRequestModel):
-    response = await DI.auth_controller(
-        request.state.db_session
-    ).request_password_reset(data)
+    response = await DI.auth_controller().request_password_reset(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

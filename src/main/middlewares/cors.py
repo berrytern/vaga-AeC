@@ -8,7 +8,7 @@ def get_regex_from_path(path: str):
     return re.sub(r"\{[a-zA-Z_-]+\}", r"[^/]+", path)
 
 
-APIRouter.__hash__ = lambda self: id(self)
+APIRouter.__hash__ = lambda self: id(self)  # ty: ignore[invalid-assignment]
 
 
 class CORSMiddleware:

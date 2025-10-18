@@ -1,8 +1,8 @@
-import uuid
+from . import Base
 from sqlalchemy import Column, String, DateTime, Date, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-from . import Base
+import uuid
 
 
 class ReaderSchema(Base):

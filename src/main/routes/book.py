@@ -81,9 +81,7 @@ async def get_one_book(request: Request, book_id: UUID):
 @auth_middleware("bk:u")
 @session_middleware
 async def update_book_info(request: Request, book_id: UUID, book: UpdateBookModel):
-    response = await DI.book_controller().update_one(
-        book_id, book
-    )
+    response = await DI.book_controller().update_one(book_id, book)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

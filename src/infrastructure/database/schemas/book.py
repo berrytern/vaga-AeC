@@ -1,9 +1,8 @@
-import uuid
+from . import Base
 from sqlalchemy import Column, String, DateTime, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID, TEXT, DOUBLE_PRECISION
 from sqlalchemy.sql import func
-
-from . import Base
+import uuid
 
 
 class BookSchema(Base):

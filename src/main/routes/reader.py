@@ -83,9 +83,7 @@ async def get_one_reader(request: Request, reader_id: UUID):
 async def update_reader_info(
     request: Request, reader_id: UUID, reader: UpdateReaderModel
 ):
-    response = await DI.reader_controller().update_one(
-        reader_id, reader
-    )
+    response = await DI.reader_controller().update_one(reader_id, reader)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -100,9 +98,7 @@ async def update_reader_info(
 @auth_middleware("rd:d", "reader_id")
 @session_middleware
 async def delete_reader_info(request: Request, reader_id: UUID):
-    response = await DI.reader_controller().delete_one(
-        reader_id
-    )
+    response = await DI.reader_controller().delete_one(reader_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

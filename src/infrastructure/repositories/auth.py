@@ -2,16 +2,15 @@ from typing import Dict, Any
 from src.application.domain.models import AuthModel
 from src.infrastructure.database.schemas import AuthSchema
 from src.utils.default import get_db_session
-from sqlalchemy import select, delete
+from sqlalchemy import select, insert, update, delete
 from json import loads
 
 
 class AuthRepository:
-
     async def create(self, data: Dict[str, Any]):
         session = get_db_session()
         insert_stmt = (
-            AuthSchema.__table__.insert()
+            insert(AuthSchema.__table__)
             .returning(
                 AuthSchema.id,
                 AuthSchema.username,
@@ -77,7 +76,7 @@ class AuthRepository:
     async def update_one(self, id, data):
         session = get_db_session()
         update_stmt = (
-            AuthSchema.__table__.update()
+            update(AuthSchema.__table__)
             .returning(
                 AuthSchema.id,
                 AuthSchema.username,

@@ -1,9 +1,9 @@
-import uuid
+from . import Base
 from sqlalchemy import Column, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from . import Base
+import uuid
 
 
 class FavoriteBookSchema(Base):

@@ -4,6 +4,7 @@ from src.application.domain.models import (
     BookQueryModel,
 )
 from src.application.services import BookService
+from uuid import UUID
 
 
 class BookController:
@@ -14,7 +15,7 @@ class BookController:
         result = await self.service.create(book)
         return result, 201, {}
 
-    async def get_one(self, book_id: str):
+    async def get_one(self, book_id: UUID):
         result = await self.service.get_one(book_id)
         return result, 200, {}
 
@@ -22,10 +23,10 @@ class BookController:
         result = await self.service.get_all(query)
         return result, 200, {}
 
-    async def update_one(self, book_id: str, book: UpdateBookModel):
+    async def update_one(self, book_id: UUID, book: UpdateBookModel):
         result = await self.service.update_one(book_id, book)
         return result, 200, {}
 
-    async def delete_one(self, book_id: str):
+    async def delete_one(self, book_id: UUID):
         await self.service.delete_one(book_id)
         return None, 204, {}

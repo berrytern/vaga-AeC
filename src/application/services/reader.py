@@ -28,15 +28,11 @@ class ReaderService:
             reader.password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
         auth = AuthModel(
-            **{
-                **reader.model_dump(exclude_none=True, exclude={"id"}),
-                **{
-                    "user_type": UserTypes.READER.value,
-                    "refresh_token": None,
-                    "last_login": None,
-                    "foreign_id": str(result["id"]),
-                },
-            }
+            **reader.model_dump(exclude_none=True, exclude={"id"}),
+            user_type=UserTypes.READER.value,
+            refresh_token=None,
+            last_login=None,
+            foreign_id=result["id"],
         )
 
         await self.auth_repository.create(auth.model_dump(exclude_none=True))

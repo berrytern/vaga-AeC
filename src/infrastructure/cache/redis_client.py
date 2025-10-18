@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 from redis.asyncio import Redis
 
 
@@ -42,6 +42,6 @@ class RedisClient:
     @classmethod
     async def delete(
         cls,
-        keys: List[str],
+        *keys: str,
     ):
         return await cls.client.delete(*keys)

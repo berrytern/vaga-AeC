@@ -34,9 +34,7 @@ router_cors = CORSMiddleware(ADMIN_ROUTER, "*")
 @auth_middleware("ad:c")
 @session_middleware
 async def create_new_admin(request: Request, admin: CreateAdminModel):
-    repository = AdminRepository(
-        AdminSchema, AdminModel, AdminList
-    )
+    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
     auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).create(admin)
@@ -58,9 +56,7 @@ async def get_all_admins(request: Request):
     query_params = dict(request.query_params)
     query = AdminQueryModel(**query_params).query_dict()
 
-    repository = AdminRepository(
-        AdminSchema, AdminModel, AdminList
-    )
+    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
     auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).get_all(query)
@@ -79,9 +75,7 @@ async def get_all_admins(request: Request):
 @cache_middleware(5)
 @session_middleware
 async def get_one_admin(request: Request, admin_id: UUID):
-    repository = AdminRepository(
-        AdminSchema, AdminModel, AdminList
-    )
+    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
     auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).get_one(admin_id)
@@ -99,9 +93,7 @@ async def get_one_admin(request: Request, admin_id: UUID):
 @auth_middleware("ad:u")
 @session_middleware
 async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdminModel):
-    repository = AdminRepository(
-        AdminSchema, AdminModel, AdminList
-    )
+    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
     auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).update_one(admin_id, admin)
@@ -119,9 +111,7 @@ async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdmin
 @auth_middleware("ad:d")
 @session_middleware
 async def delete_admin_info(request: Request, admin_id: UUID):
-    repository = AdminRepository(
-        AdminSchema, AdminModel, AdminList
-    )
+    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
     auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).delete_one(admin_id)

@@ -29,15 +29,11 @@ class AdminService:
             admin.password.encode(), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
         ).decode()
         auth = AuthModel(
-            **{
-                **admin.model_dump(exclude_none=True, exclude={"id"}),
-                **{
-                    "user_type": UserTypes.ADMIN.value,
-                    "refresh_token": None,
-                    "last_login": None,
-                    "foreign_id": str(result["id"]),
-                },
-            }
+            **admin.model_dump(exclude_none=True, exclude={"id"}),
+            user_type=UserTypes.ADMIN.value,
+            refresh_token=None,
+            last_login=None,
+            foreign_id=result["id"],
         )
 
         await self.auth_repository.create(auth.model_dump(exclude_none=True))

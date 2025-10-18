@@ -1,6 +1,5 @@
 import pytest
-from unittest.mock import Mock, MagicMock
-from src.infrastructure.repositories import AdminRepository
+from unittest.mock import MagicMock
 from tests.unit.mocks.admin_data import ADMIN_DATA
 from uuid import UUID
 
