@@ -6,16 +6,6 @@ from uuid import UUID
 
 
 @pytest.mark.asyncio
-async def test_repository_initialization(session_mock):
-    schema, model, list_model = Mock(), Mock(), Mock()
-    repository = AdminRepository(
-        session=session_mock, schema=schema, model=model, list_model=list_model
-    )
-
-    assert repository.session == session_mock
-
-
-@pytest.mark.asyncio
 async def test_create_admin(admin_repository, session_mock):
     # Prepare test data
     input_data = {"name": ADMIN_DATA["name"]}

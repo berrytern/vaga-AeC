@@ -15,8 +15,8 @@ async def test_session_middleware(request_mock):
     async def next_mock(*args, **kwargs):
         return excepted_answer
 
-    # Mock get_db to return our session mock
-    with patch("src.main.middlewares.session.get_db", return_value=db_session_mock):
+    # Mock get_session to return our session mock
+    with patch("src.main.middlewares.session.get_session", return_value=db_session_mock):
         # Verify that the middleware is a callable function
         assert callable(session_middleware)
         assert callable(session_middleware(next_mock))
