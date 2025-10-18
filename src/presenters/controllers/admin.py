@@ -20,8 +20,8 @@ class AdminController:
         return result, 200, {}
 
     async def get_all(self, query: AdminQueryModel):
-        result = await self.service.get_all(query)
-        return result, 200, {}
+        result, total_count = await self.service.get_all(query)
+        return result, 200, {"X-Total-Count": str(total_count)}
 
     async def update_one(self, admin_id: UUID, admin: UpdateAdminModel):
         result = await self.service.update_one(admin_id, admin)

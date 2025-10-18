@@ -22,8 +22,8 @@ class FavoriteController:
     async def get_all(
         self, query: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], int, Dict[str, Any]]:
-        result = await self.service.get_all(query)
-        return result, 200, {}
+        result, total_count = await self.service.get_all(query)
+        return result, 200, {"X-Total-Count": str(total_count)}
 
     async def delete_one(
         self, reader_id: UUID, book_id: UUID

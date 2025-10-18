@@ -20,8 +20,8 @@ class BookController:
         return result, 200, {}
 
     async def get_all(self, query: BookQueryModel):
-        result = await self.service.get_all(query)
-        return result, 200, {}
+        result, total_count = await self.service.get_all(query)
+        return result, 200, {"X-Total-Count": str(total_count)}
 
     async def update_one(self, book_id: UUID, book: UpdateBookModel):
         result = await self.service.update_one(book_id, book)

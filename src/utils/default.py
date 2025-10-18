@@ -53,6 +53,10 @@ db_session_var: ContextVar[Optional[AsyncSession]] = cast(
     ContextVar[Optional[AsyncSession]], ContextVar("db_session", default=None)
 )  # ty: ignore[invalid-assignment]
 
+aux_db_session_var: ContextVar[Optional[AsyncSession]] = cast(
+    ContextVar[Optional[AsyncSession]], ContextVar("aux_db_session", default=None)
+)  # ty: ignore[invalid-assignment]
+
 
 def get_db_session():
     session = db_session_var.get()
@@ -67,4 +71,13 @@ def get_or_set_db_session():
         session = get_session()
         token = db_session_var.set(session)
         return token, db_session_var.get()
+    return None, session
+
+
+def get_aux_db_session():
+    session = aux_db_session_var.get()
+    if session is None:
+        session = get_session()
+        token = aux_db_session_var.set(session)
+        return token, session
     return None, session

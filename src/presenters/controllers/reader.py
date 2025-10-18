@@ -24,8 +24,8 @@ class ReaderController:
         return result, 200, {}
 
     async def get_all(self, query: ReaderQueryModel):
-        result = await self.service.get_all(query)
-        return result, 200, {}
+        result, total_count = await self.service.get_all(query)
+        return result, 200, {"X-Total-Count": str(total_count)}
 
     async def update_one(self, reader_id: UUID, reader: UpdateReaderModel):
         result = await self.service.update_one(reader_id, reader)
