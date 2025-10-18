@@ -14,7 +14,7 @@ from datetime import date, datetime, timezone
 
 
 class CreateReaderModel(CreateAuthModel):
-    name: StrictStr = Field(..., min_length=10, max_length=60)
+    name: StrictStr = Field(..., min_length=5, max_length=60)
     birthday: date = Field(..., description="Format: YYYY-MM-DD")
 
     model_config = ConfigDict(
