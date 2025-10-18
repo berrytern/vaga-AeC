@@ -19,6 +19,7 @@ from src.utils import settings, default
 from http import HTTPStatus
 from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
+from hashlib import sha256
 from email.mime.text import MIMEText
 import bcrypt
 import jwt
@@ -43,17 +44,17 @@ class AuthService:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
-        if not bcrypt.checkpw(data.password.encode(), result["password"].encode()):
+        if not bcrypt.checkpw(data.password.encode(), result.password.encode()):
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
         current = datetime.now(timezone.utc)
         payload = {
-            "sub": str(result["foreign_id"]),
+            "sub": str(result.foreign_id),
             "iss": settings.ISSUER,
-            "type": result["user_type"],
+            "type": result.user_type,
             "iat": current,
-            "scope": str(self._getScopeByUserType(result["user_type"])),
+            "scope": str(self._getScopeByUserType(result.user_type)),
             "exp": current + timedelta(seconds=default.TOKEN_EXP_TIME),
         }
         token = jwt.encode(
@@ -64,11 +65,12 @@ class AuthService:
         response = {
             "access_token": token,
             "refresh_token": bcrypt.hashpw(
-                token.encode("utf8"), bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS)
+                sha256(token.encode("utf8")).hexdigest().encode("utf8"),
+                bcrypt.gensalt(settings.PASSWORD_SALT_ROUNDS),
             ).decode("utf8"),
         }
         await self.repository.update_one(
-            str(result["id"]),
+            str(result.id),
             {
                 "refresh_token": response["refresh_token"],
                 "last_login": datetime.now(timezone.utc),
@@ -86,17 +88,18 @@ class AuthService:
         )
 
     async def refresh_token(self, data: RefreshCredentialModel):
+        if await RedisClient.get(sha256(data.access_token.encode("utf8")).hexdigest()):
+            raise UnauthorizedException(HTTPStatus.UNAUTHORIZED.phrase, "Revoked token")
         result = await self.repository.get_one({"refresh_token": data.refresh_token})
         if result is None:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
-        if await RedisClient.get(data.access_token):
-            raise UnauthorizedException(HTTPStatus.UNAUTHORIZED.phrase, "Revoked token")
         current = datetime.utcnow()
         _ = self.decode_token(data.access_token)
         if not bcrypt.checkpw(
-            data.access_token.encode("utf8"), data.refresh_token.encode("utf8")
+            sha256(data.access_token.encode("utf8")).hexdigest().encode("utf8"),
+            data.refresh_token.encode("utf8"),
         ):
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
@@ -104,11 +107,11 @@ class AuthService:
 
         token = jwt.encode(
             {
-                "sub": str(result["id"]),
+                "sub": str(result.id),
                 "iss": settings.ISSUER,
-                "type": result["user_type"],
+                "type": result.user_type,
                 "iat": current,
-                "scope": str(self._getScopeByUserType(result["user_type"])),
+                "scope": str(self._getScopeByUserType(result.user_type)),
                 "exp": current + timedelta(seconds=default.REFRESH_TOKEN_EXP_TIME),
             },
             settings.JWT_SECRET,
@@ -117,11 +120,12 @@ class AuthService:
         response = {
             "access_token": token,
             "refresh_token": bcrypt.hashpw(
-                token.encode("utf8"), bcrypt.gensalt(12)
+                sha256(token.encode("utf8")).hexdigest().encode("utf8"),
+                bcrypt.gensalt(12),
             ).decode("utf8"),
         }
         await self.repository.update_one(
-            str(result["id"]),
+            str(result.id),
             {
                 "refresh_token": response["refresh_token"],
                 "last_login": datetime.now(),

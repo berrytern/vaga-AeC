@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Optional, Dict, Any
 from src.application.domain.models import AuthModel
 from src.infrastructure.database.schemas import AuthSchema
 from src.utils.default import get_db_session
@@ -35,29 +35,20 @@ class AuthRepository:
             )
         return result
 
-    async def get_one(self, fields: Dict[str, Any]):
+    async def get_one(self, fields: Dict[str, Any]) -> Optional[AuthSchema]:
         session = get_db_session()
         get_one_stmt = select(AuthSchema)
+
         for key, value in fields.items():
             get_one_stmt = get_one_stmt.where(
                 AuthSchema.__getattribute__(AuthSchema, key) == value
             )
+
         get_one_stmt = get_one_stmt.limit(1)
+
         result = (await session.execute(get_one_stmt)).fetchone()
-        if result:
-            item: AuthSchema = result[0]
-            result = loads(
-                AuthModel(
-                    id=item.id,
-                    username=item.username,
-                    password=item.password,
-                    email=item.email,
-                    user_type=item.user_type,
-                    last_login=item.last_login,
-                    foreign_id=item.foreign_id,
-                ).model_dump_json()
-            )
-        return result
+
+        return result[0] if result else result
 
     async def get_one_by_username(self, username):
         session = get_db_session()
