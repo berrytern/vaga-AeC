@@ -1,6 +1,3 @@
-from src.background.tasks import CreateDefaultAdminTask
-from src.infrastructure.database.connection import init_models, get_db
-from src.infrastructure.repositories import AuthRepository
 from src.presenters.exceptions.api_exception_manager import APIExceptionManager
 from src.main.middlewares import register_track_middleware
 from src.main.routes import (
@@ -11,10 +8,8 @@ from src.main.routes import (
     READER_ROUTER,
 )
 from src.utils import settings
-from src.utils.logger import logger
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
-from contextlib import asynccontextmanager
 
 
 http_app = FastAPI(
@@ -50,22 +45,6 @@ https_app.include_router(
 https_app.include_router(READER_ROUTER, prefix="/v1/readers", tags=["reader"])
 https_app.include_router(BOOK_ROUTER, prefix="/v1/books", tags=["book"])
 
-
-# This is a context manager that will run before the app starts
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # use Background service layer if it grows in complexity
-    await init_models()
-    # Create the admin user if it does not exist
-    async with get_db() as session:
-        repository = AuthRepository(session)
-        await CreateDefaultAdminTask(repository, logger.background_logger).run()
-        await session.commit()
-    yield
-
-
-# Set the lifespan context
-https_app.router.lifespan_context = lifespan
 
 # Register the error handling
 APIExceptionManager.register_error_handling(https_app)

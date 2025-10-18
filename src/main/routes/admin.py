@@ -35,9 +35,9 @@ router_cors = CORSMiddleware(ADMIN_ROUTER, "*")
 @session_middleware
 async def create_new_admin(request: Request, admin: CreateAdminModel):
     repository = AdminRepository(
-        request.state.db_session, AdminSchema, AdminModel, AdminList
+        AdminSchema, AdminModel, AdminList
     )
-    auth_repository = AuthRepository(request.state.db_session)
+    auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).create(admin)
     return JSONResponse(
@@ -59,9 +59,9 @@ async def get_all_admins(request: Request):
     query = AdminQueryModel(**query_params).query_dict()
 
     repository = AdminRepository(
-        request.state.db_session, AdminSchema, AdminModel, AdminList
+        AdminSchema, AdminModel, AdminList
     )
-    auth_repository = AuthRepository(request.state.db_session)
+    auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).get_all(query)
     return JSONResponse(
@@ -80,9 +80,9 @@ async def get_all_admins(request: Request):
 @session_middleware
 async def get_one_admin(request: Request, admin_id: UUID):
     repository = AdminRepository(
-        request.state.db_session, AdminSchema, AdminModel, AdminList
+        AdminSchema, AdminModel, AdminList
     )
-    auth_repository = AuthRepository(request.state.db_session)
+    auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).get_one(admin_id)
     return JSONResponse(
@@ -100,9 +100,9 @@ async def get_one_admin(request: Request, admin_id: UUID):
 @session_middleware
 async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdminModel):
     repository = AdminRepository(
-        request.state.db_session, AdminSchema, AdminModel, AdminList
+        AdminSchema, AdminModel, AdminList
     )
-    auth_repository = AuthRepository(request.state.db_session)
+    auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).update_one(admin_id, admin)
     return JSONResponse(
@@ -120,9 +120,9 @@ async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdmin
 @session_middleware
 async def delete_admin_info(request: Request, admin_id: UUID):
     repository = AdminRepository(
-        request.state.db_session, AdminSchema, AdminModel, AdminList
+        AdminSchema, AdminModel, AdminList
     )
-    auth_repository = AuthRepository(request.state.db_session)
+    auth_repository = AuthRepository()
     service = AdminService(repository, auth_repository)
     response = await AdminController(service).delete_one(admin_id)
     return JSONResponse(

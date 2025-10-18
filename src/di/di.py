@@ -43,38 +43,37 @@ class DI:
     __email_client = EmailClient(settings.SMTP_HOST, settings.SMTP_PORT, settings.SMTP_USER, settings.SMTP_PASSWORD)
 
     @classmethod
-    def auth_controller(cls, db_session) -> AuthController:
-        repository = AuthRepository(db_session)
+    def auth_controller(cls) -> AuthController:
+        repository = AuthRepository()
         service = AuthService(repository, cls.__email_client)
         return AuthController(service)
 
     @classmethod
-    def admin_controller(cls, db_session) -> AdminController:
-        repository = AdminRepository(db_session, AdminSchema, AdminModel, AdminList)
-        auth_repository = AuthRepository(db_session)
+    def admin_controller(cls) -> AdminController:
+        repository = AdminRepository(AdminSchema, AdminModel, AdminList)
+        auth_repository = AuthRepository()
         service = AdminService(repository, auth_repository)
         return AdminController(service)
 
     @classmethod
-    def book_controller(cls, db_session) -> BookController:
-        repository = BookRepository(db_session, BookSchema, BookModel, BookList)
+    def book_controller(cls) -> BookController:
+        repository = BookRepository(BookSchema, BookModel, BookList)
         service = BookService(repository)
         return BookController(service)
 
     @classmethod
-    def reader_controller(cls, db_session) -> ReaderController:
-        repository = ReaderRepository(db_session, ReaderSchema, ReaderModel, ReaderList)
-        auth_repository = AuthRepository(db_session)
+    def reader_controller(cls) -> ReaderController:
+        repository = ReaderRepository(ReaderSchema, ReaderModel, ReaderList)
+        auth_repository = AuthRepository()
         service = ReaderService(repository, auth_repository)
         return ReaderController(service)
 
     @classmethod
-    def reader_favorite_controller(cls, db_session) -> FavoriteController:
+    def reader_favorite_controller(cls) -> FavoriteController:
         reader_repository = ReaderRepository(
-            db_session, ReaderSchema, ReaderModel, ReaderList
+            ReaderSchema, ReaderModel, ReaderList
         )
         repository = FavoriteRepository(
-            db_session,
             FavoriteBookSchema,
             FavoriteModel,
             FavoriteList,
