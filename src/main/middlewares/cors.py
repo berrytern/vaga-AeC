@@ -1,23 +1,43 @@
-from typing import Union, List
+from typing import Union, List, TypedDict, Set, Dict
 from fastapi import Request, APIRouter
 from starlette.responses import PlainTextResponse
 import re
 
 
+class EndpointCORSConfig(TypedDict):
+    origins: Union[Set[str], str]
+    methods: Set[str]
+    headers: Set[str]
+    expose_headers: Set[str]
+    allow_credentials: bool
+    max_age: int
+    defined: bool
+
+
+class CorsConfig(TypedDict):
+    origins: Union[Set[str], str]
+    max_age: int
+    allow_credentials: bool
+    endpoints: Dict[str, EndpointCORSConfig]
+
+
+RE_FROM_PATH = re.compile(r"\{[a-zA-Z_-]+\}")
+
+
 def get_regex_from_path(path: str):
-    return re.sub(r"\{[a-zA-Z_-]+\}", r"[^/]+", path)
+    return RE_FROM_PATH.sub(r"[^/]+", path)
 
 
 APIRouter.__hash__ = lambda self: id(self)  # ty: ignore[invalid-assignment]
 
 
 class CORSMiddleware:
-    routers = {}
+    routers: Dict[APIRouter, CorsConfig] = {}
 
     def __init__(
         self,
         router: APIRouter,
-        origins: Union[List[str], str] = [],
+        origins: Union[Set[str], str] = set(),
         allow_credentials: bool = False,
         max_age: int = 86400,
     ):
@@ -41,9 +61,9 @@ class CORSMiddleware:
         if self.regex_path not in self.endpoints:
             self.endpoints[self.regex_path] = {
                 "origins": CORSMiddleware.routers[self.router]["origins"],
-                "methods": [],
-                "headers": [],
-                "expose_headers": [],
+                "methods": set(),
+                "headers": set(),
+                "expose_headers": set(),
                 "allow_credentials": CORSMiddleware.routers[self.router][
                     "allow_credentials"
                 ],
@@ -56,35 +76,44 @@ class CORSMiddleware:
         if origin == "*":
             self.endpoints[self.regex_path]["origins"] = "*"
         else:
-            self.endpoints[self.regex_path]["origins"].append(origin)
+            self.endpoints[self.regex_path]["origins"].add(origin)
         return self
 
     def allow_origins(self, *origins: str):
-        self.endpoints[self.regex_path]["origins"] = origins
+        if "*" in origins:
+            self.endpoints[self.regex_path]["origins"] = "*"
+        else:
+            (
+                self.endpoints[self.regex_path]["origins"].add(origin)
+                for origin in origins
+            )
         return self
 
     def allow_header(self, header: str):
-        self.endpoints[self.regex_path]["headers"].append(header.lower())
+        self.endpoints[self.regex_path]["headers"].add(header.lower())
         return self
 
     def allow_headers(self, *headers: str):
-        self.endpoints[self.regex_path]["headers"] = [h.lower() for h in headers]
+        (self.endpoints[self.regex_path]["headers"].add(h.lower()) for h in headers)
         return self
 
     def expose_header(self, header: str):
-        self.endpoints[self.regex_path]["expose_headers"].append(header.lower())
+        self.endpoints[self.regex_path]["expose_headers"].add(header.lower())
         return self
 
     def expose_headers(self, *headers: str):
-        self.endpoints[self.regex_path]["expose_headers"] = [h.lower() for h in headers]
+        (
+            self.endpoints[self.regex_path]["expose_headers"].add(h.lower())
+            for h in headers
+        )
         return self
 
     def allow_method(self, method: str):
-        self.endpoints[self.regex_path]["methods"].append(method.upper())
+        self.endpoints[self.regex_path]["methods"].add(method.upper())
         return self
 
     def allow_methods(self, methods: List[str]):
-        self.endpoints[self.regex_path]["methods"] = [m.lower() for m in methods]
+        (self.endpoints[self.regex_path]["methods"].add(m.upper()) for m in methods)
         return self
 
     def allow_credentials(self, value: bool):
