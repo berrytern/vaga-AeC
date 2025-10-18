@@ -1,9 +1,10 @@
-from typing import cast, Type, Optional, List, Dict, Any
+from typing import cast, Type, Optional, Tuple, List, Dict, Any
 from src.application.domain.models import ReaderModel, ReaderList
 from src.application.port import ReaderInterface
 from src.infrastructure.database.schemas import ReaderSchema
-from src.utils.default import get_db_session
-from sqlalchemy import select, delete
+from src.utils.default import get_db_session, get_aux_db_session, aux_db_session_var
+from sqlalchemy import select, insert, update, delete, func
+from asyncio import gather
 from json import loads
 from datetime import datetime
 from uuid import UUID
@@ -23,7 +24,7 @@ class ReaderRepository:
     async def create(self, data: Dict[str, Any]) -> Optional[ReaderInterface]:
         session = get_db_session()
         insert_stmt = (
-            self.schema.__table__.insert()
+            insert(self.schema.__table__)
             .returning(
                 self.schema.id,
                 self.schema.name,
@@ -71,20 +72,44 @@ class ReaderRepository:
         else:
             return result
 
-    async def get_all(self, filters: Dict[str, Any]) -> List[ReaderInterface]:
+    async def get_all(
+        self, filters: Dict[str, Any]
+    ) -> Tuple[List[ReaderInterface], int]:
         session = get_db_session()
-        stmt = select(self.schema).filter_by(**filters["query"]).limit(filters["limit"])
-        stream = await session.stream_scalars(stmt.order_by(self.schema.id))
+        token, count_session = get_aux_db_session()
+        stmt = select(self.schema).filter_by(**filters["query"])
+        search_conditions = []
+        for key, value in filters["like"].items():
+            if hasattr(self.schema, key):
+                search_conditions.append(getattr(self.schema, key).ilike(value))
+        stmt = stmt.filter(*search_conditions)
+        count_stmt = select(func.count()).select_from(stmt.subquery())
+        sort = getattr(self.schema, filters["sort"])
+        if filters["sort_direction"] < 0:
+            sort = sort.desc()
+        total_count, stream = await gather(
+            count_session.execute(count_stmt),
+            session.stream_scalars(
+                stmt.order_by(sort)
+                .offset((filters["page"] - 1) * filters["limit"])
+                .limit(filters["limit"])
+            ),
+        )
+        total_count = total_count.scalar_one()
+        if token is not None:
+            aux_db_session_var.reset(token)
+            await count_session.aclose()
+
         return loads(
             self.list_model(root=[item async for item in stream]).model_dump_json()
-        )
+        ), total_count
 
     async def update_one(
-        self, id: str, data: Dict[str, Any]
+        self, id: UUID, data: Dict[str, Any]
     ) -> Optional[ReaderInterface]:
         session = get_db_session()
         update_stmt = (
-            self.schema.__table__.update()
+            update(self.schema.__table__)
             .returning(
                 self.schema.id,
                 self.schema.name,
@@ -111,7 +136,7 @@ class ReaderRepository:
         return result
 
     async def update_books_read_count(
-        self, id: str, count: int
+        self, id: UUID, count: int
     ) -> Optional[ReaderInterface]:
         session = get_db_session()
         update_stmt = (
@@ -141,6 +166,6 @@ class ReaderRepository:
             )
         return result
 
-    async def delete_one(self, id: str) -> None:
+    async def delete_one(self, id: UUID) -> None:
         session = get_db_session()
         await session.execute(delete(self.schema).where(self.schema.id == id))

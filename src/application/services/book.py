@@ -1,10 +1,11 @@
-from typing import Optional, Dict, List, Any
+from typing import Optional, Tuple, Dict, List, Any
 from src.application.domain.models import (
     BookQueryModel,
     UpdateBookModel,
     CreateBookModel,
 )
 from src.infrastructure.repositories import BookRepository
+from uuid import UUID
 
 
 class BookService:
@@ -29,19 +30,19 @@ class BookService:
         )
         return result
 
-    async def get_one(self, book_id: str) -> Optional[Dict[str, Any]]:
+    async def get_one(self, book_id: UUID) -> Optional[Dict[str, Any]]:
         """
         Get a single book by ID
 
         Args:
-            book_id (str): ID of the book to retrieve
+            book_id (UUID): ID of the book to retrieve
 
         Returns:
             Optional[Dict[str, Any]]: Book data if found, None otherwise
         """
         return await self.repository.get_one({"id": book_id})
 
-    async def get_all(self, query: BookQueryModel) -> List[Dict[str, Any]]:
+    async def get_all(self, query: BookQueryModel) -> Tuple[List[Dict[str, Any]], int]:
         """
         Get all books matching the query parameters
 
@@ -49,18 +50,18 @@ class BookService:
             query (BookQueryModel): Query parameters for filtering books
 
         Returns:
-            List[Dict[str, Any]]: List of matching books
+            Tuple[List[Dict[str, Any]], int]: Tuple containing list of books and total count
         """
         return await self.repository.get_all(query)
 
     async def update_one(
-        self, book_id: str, book: UpdateBookModel
+        self, book_id: UUID, book: UpdateBookModel
     ) -> Optional[Dict[str, Any]]:
         """
         Update a book's information
 
         Args:
-            book_id (str): ID of the book to update
+            book_id (UUID): ID of the book to update
             book (UpdateBookModel): Updated book data
 
         Returns:
@@ -70,11 +71,11 @@ class BookService:
             book_id, book.model_dump(exclude_none=True)
         )
 
-    async def delete_one(self, book_id: str) -> None:
+    async def delete_one(self, book_id: UUID) -> None:
         """
         Delete a book by ID
 
         Args:
-            book_id (str): ID of the book to delete
+            book_id (UUID): ID of the book to delete
         """
         await self.repository.delete_one(book_id)

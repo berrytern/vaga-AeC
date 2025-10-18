@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List, Any
+from typing import Optional, Tuple, Dict, List, Any
 from src.application.domain.models import (
     AuthModel,
     ReaderQueryModel,
@@ -9,6 +9,7 @@ from src.application.domain.utils import UserTypes
 from src.application.port import ReaderInterface
 from src.infrastructure.repositories import AuthRepository, ReaderRepository
 from src.utils import settings
+from uuid import UUID
 import bcrypt
 
 
@@ -38,18 +39,20 @@ class ReaderService:
         await self.auth_repository.create(auth.model_dump(exclude_none=True))
         return result
 
-    async def get_one(self, reader_id: str):
+    async def get_one(self, reader_id: UUID):
         return await self.repository.get_one({"id": reader_id})
 
-    async def get_all(self, query: ReaderQueryModel) -> List[Dict[str, Any]]:
+    async def get_all(
+        self, query: ReaderQueryModel
+    ) -> Tuple[List[Dict[str, Any]], int]:
         return await self.repository.get_all(query)
 
     async def update_one(
-        self, reader_id: str, reader: UpdateReaderModel
+        self, reader_id: UUID, reader: UpdateReaderModel
     ) -> Optional[Any]:
         return await self.repository.update_one(
             reader_id, reader.model_dump(exclude_none=True)
         )
 
-    async def delete_one(self, reader_id: str) -> None:
+    async def delete_one(self, reader_id: UUID) -> None:
         await self.repository.delete_one(reader_id)
