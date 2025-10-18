@@ -8,11 +8,8 @@ from uuid import UUID
 @pytest.mark.asyncio
 async def test_reader_repository_initialization(session_mock):
     schema, model, list_model = Mock(), Mock(), Mock()
-    repository = ReaderRepository(
-        session=session_mock, schema=schema, model=model, list_model=list_model
-    )
+    repository = ReaderRepository(schema=schema, model=model, list_model=list_model)
 
-    assert repository.session == session_mock
     assert repository.schema == schema
     assert repository.model == model
     assert repository.list_model == list_model

@@ -1,6 +1,6 @@
 from typing import Type, Optional, Dict, Any
 from .reader import ReaderRepository
-from sqlalchemy.ext.asyncio import AsyncSession
+from src.utils.default import get_db_session
 from sqlalchemy import select, delete
 from json import loads
 from src.infrastructure.database.schemas import FavoriteBookSchema
@@ -10,19 +10,18 @@ from src.application.domain.models import FavoriteModel, FavoriteList
 class FavoriteRepository:
     def __init__(
         self,
-        session: AsyncSession,
         schema: Type[FavoriteBookSchema],
         model: Type[FavoriteModel],
         list_model: Type[FavoriteList],
         reader_repository: ReaderRepository,
     ):
-        self.session = session  # Database session
         self.schema = schema
         self.model = model
         self.list_model = list_model
         self.reader_repository = reader_repository
 
     async def create(self, reader_id: str, book_id: str) -> Optional[Dict[str, Any]]:
+        session = get_db_session()
         insert_stmt = (
             self.schema.__table__.insert()
             .returning(
@@ -34,7 +33,7 @@ class FavoriteRepository:
             )
             .values(reader_id=reader_id, book_id=book_id)
         )
-        result = (await self.session.execute(insert_stmt)).fetchone()
+        result = (await session.execute(insert_stmt)).fetchone()
         if result:
             result = loads(
                 FavoriteModel(
@@ -49,13 +48,14 @@ class FavoriteRepository:
         return result
 
     async def get_one(self, reader_id: str, book_id: str) -> Optional[Dict[str, Any]]:
+        session = get_db_session()
         stmt = (
             select(self.schema)
             .where(self.schema.reader_id == reader_id)
             .where(self.schema.book_id == book_id)
             .limit(1)
         )
-        result = (await self.session.execute(stmt)).fetchone()
+        result = (await session.execute(stmt)).fetchone()
         if result:
             item: FavoriteBookSchema = result[0]
             result = loads(
@@ -70,13 +70,15 @@ class FavoriteRepository:
         return result
 
     async def get_all(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        session = get_db_session()
         stmt = select(self.schema).filter_by(**filters["query"]).limit(filters["limit"])
-        stream = await self.session.stream_scalars(stmt.order_by(self.schema.id))
+        stream = await session.stream_scalars(stmt.order_by(self.schema.id))
         result = [item async for item in stream]
         return loads(self.list_model(root=result).model_dump_json())
 
     async def delete_one(self, reader_id: str, book_id: str) -> None:
-        await self.session.execute(
+        session = get_db_session()
+        await session.execute(
             delete(self.schema)
             .where(self.schema.reader_id == reader_id)
             .where(self.schema.book_id == book_id)

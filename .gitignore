@@ -1,4 +1,5 @@
 .env
+.venv/
 *_env/
 __pycache__/
 .certs/

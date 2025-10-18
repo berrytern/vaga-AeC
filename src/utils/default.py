@@ -1,3 +1,10 @@
+from typing import Optional, cast
+from contextvars import ContextVar
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.infrastructure.database.connection import get_session
+
+
 # Token expiration time in seconds
 TOKEN_EXP_TIME = 5 * 60 * 60
 REFRESH_TOKEN_EXP_TIME = 24 * 60 * 60
@@ -31,8 +38,7 @@ RESET_PASSWD_BODY_HTML = """\
             <br/><b>If you have not asked for a password reset, please ignore this e-mail.</b>
             <br/><br/>
             Should you have any questions, always feel free to contact our
-             <a href="mailto:{support_email}?subject=Support Me to Recover Access to My Account&
-            body=Hi, I am failling to recover my password. Please, Help me!">support team</a>.
+             <a href="mailto:{support_email}?subject=Support Me to Recover Access to My Account&body=Hi, I am failling to recover my password. Please, Help me!">support team</a>.
             <br/><br/>
             Best regards,
             <br/><br/>
@@ -40,4 +46,25 @@ RESET_PASSWD_BODY_HTML = """\
         </p>
     </body>
 </html>
-"""
+"""  # noqa: E501
+
+
+db_session_var: ContextVar[Optional[AsyncSession]] = cast(
+    ContextVar[Optional[AsyncSession]], ContextVar("db_session", default=None)
+)  # ty: ignore[invalid-assignment]
+
+
+def get_db_session():
+    session = db_session_var.get()
+    if session is None:
+        raise HTTPException(500, "session is not defined")
+    return session
+
+
+def get_or_set_db_session():
+    session = db_session_var.get()
+    if session is None:
+        session = get_session()
+        token = db_session_var.set(session)
+        return token, db_session_var.get()
+    return None, session

@@ -15,18 +15,20 @@ from src.infrastructure.database.schemas import (
     ReaderSchema,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.utils.default import db_session_var
 
 
 @pytest.fixture
 def session_mock():
     session = AsyncMock(spec=AsyncSession)
-    return session
+    token = db_session_var.set(session)
+    yield session
+    db_session_var.reset(token)
 
 
 @pytest.fixture
 def reader_repository(session_mock):
     return ReaderRepository(
-        session=session_mock,
         schema=ReaderSchema,
         model=ReaderModel,
         list_model=ReaderList,
@@ -35,6 +37,4 @@ def reader_repository(session_mock):
 
 @pytest.fixture
 def admin_repository(session_mock):
-    return AdminRepository(
-        session=session_mock, schema=AdminSchema, model=AdminModel, list_model=AdminList
-    )
+    return AdminRepository(schema=AdminSchema, model=AdminModel, list_model=AdminList)

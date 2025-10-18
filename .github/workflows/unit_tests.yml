@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ "master", "develop" ]
 
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,30 +15,20 @@ jobs:
         python-version: ["3.10", "3.11"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Set up Python ${{ matrix.python-version }} and uv
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install poetry
+    - name: Install uv
       run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-
-    - name: Configure poetry
-      run: |
-        poetry config virtualenvs.create true
-        poetry config virtualenvs.in-project true
-
-    - name: Cache poetry virtualenv
-      uses: actions/cache@v3
-      with:
-        path: ./.venv
-        key: ${{ runner.os }}-venv-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        echo "Installing uv..." &&
+        curl -LsSf https://astral.sh/uv/install.sh | sh
 
     - name: Install dependencies
-      run: poetry install --with dev
+      run: uv sync
 
     - name: Run tests
-      run:  poetry run pytest --cov=src/ --cov-report=term-missing tests/
+      run: uv run pytest --cov=src/ --cov-report=term-missing tests/

@@ -1,18 +1,7 @@
 import pytest
-from unittest.mock import Mock, MagicMock
-from src.infrastructure.repositories import AdminRepository
+from unittest.mock import MagicMock
 from tests.unit.mocks.admin_data import ADMIN_DATA
 from uuid import UUID
-
-
-@pytest.mark.asyncio
-async def test_repository_initialization(session_mock):
-    schema, model, list_model = Mock(), Mock(), Mock()
-    repository = AdminRepository(
-        session=session_mock, schema=schema, model=model, list_model=list_model
-    )
-
-    assert repository.session == session_mock
 
 
 @pytest.mark.asyncio

@@ -1,7 +1,7 @@
-from src.infrastructure.database import get_db
 from fastapi import Request
 from typing import Callable
 from functools import wraps
+from src.utils.default import get_or_set_db_session, db_session_var
 
 
 # injects a database session into the request state
@@ -19,7 +19,7 @@ def session_middleware(next: Callable):
         @session_middleware
         async def db_action_endpoint(request: Request):
             # Enable use of the database session in the endpoint
-            request.state.db_session
+
         ```
     """
 
@@ -34,10 +34,20 @@ def session_middleware(next: Callable):
         Returns:
             Callable: The wrapped function  with database session access.
         """
-        request.state.db_session = get_db()
-        response = await next(*args, request=request, **kwargs)
-        # commit changes if no errors
-        await request.state.db_session.commit()
-        return response
+        token, session = get_or_set_db_session()
+        async with session as db:
+            try:
+                response = await next(*args, request=request, **kwargs)
+                # commit changes if no errors
+                await db.commit()
+                return response
+            except BaseException as e:
+                # Rollback only on errors
+                await db.rollback()
+                raise e
+            finally:
+                await db.close()
+                if token:
+                    db_session_var.reset(token)
 
     return wrapper

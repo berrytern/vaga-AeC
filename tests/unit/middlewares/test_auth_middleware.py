@@ -41,11 +41,13 @@ async def test_auth_middleware(request_mock, payload, scope):
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
-    ), patch(
-        "src.main.middlewares.auth.jwt.decode", return_value=payload
-    ) as decode_mock:
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch("src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret),
+        patch(
+            "src.main.middlewares.auth.jwt.decode", return_value=payload
+        ) as decode_mock,
+    ):
         assert callable(auth_middleware)
         assert callable(auth_middleware(scope))
         assert callable(auth_middleware(scope)(next_mock))
@@ -90,11 +92,13 @@ async def test_auth_middleware_with_revoked_token(request_mock, payload, scope):
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
-    ), patch(
-        "src.main.middlewares.auth.jwt.decode", return_value=payload
-    ) as decode_mock:
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch("src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret),
+        patch(
+            "src.main.middlewares.auth.jwt.decode", return_value=payload
+        ) as decode_mock,
+    ):
         assert callable(auth_middleware)
         assert callable(auth_middleware(scope))
         assert callable(auth_middleware(scope)(next_mock))
@@ -137,11 +141,13 @@ async def test_auth_middleware_without_permission(request_mock, payload, scope):
     async def next_mock(*args, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
-    ), patch(
-        "src.main.middlewares.auth.jwt.decode", return_value=payload
-    ) as decode_mock:
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch("src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret),
+        patch(
+            "src.main.middlewares.auth.jwt.decode", return_value=payload
+        ) as decode_mock,
+    ):
         assert callable(auth_middleware)
         assert callable(auth_middleware(scope))
         assert callable(auth_middleware(scope)(next_mock))
@@ -168,9 +174,12 @@ async def test_auth_middleware_with_invalid_jwt_secret(request_mock):
     async def next_mock(*args, **kwargs):
         return ""
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.jwt.decode",
-        side_effect=PyJWTError("Invalid signature"),
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch(
+            "src.main.middlewares.auth.jwt.decode",
+            side_effect=PyJWTError("Invalid signature"),
+        ),
     ):
         middleware = auth_middleware("admin")(next_mock)
 
@@ -198,9 +207,13 @@ async def test_auth_middleware_without_authorization_header(request_mock):
     async def next_mock(*args, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
-    ), patch("src.main.middlewares.auth.jwt.decode", return_value=token) as decode_mock:
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch("src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret),
+        patch(
+            "src.main.middlewares.auth.jwt.decode", return_value=token
+        ) as decode_mock,
+    ):
         assert callable(auth_middleware)
         assert callable(auth_middleware(scope))
         assert callable(auth_middleware(scope)(next_mock))
@@ -248,11 +261,13 @@ async def test_auth_middleware_not_owned(
     async def next_mock(*args, request: Request, **kwargs):
         return expected_response
 
-    with patch("src.main.middlewares.auth.RedisClient", redis_mock), patch(
-        "src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret
-    ), patch(
-        "src.main.middlewares.auth.jwt.decode", return_value=payload
-    ) as decode_mock:
+    with (
+        patch("src.main.middlewares.auth.RedisClient", redis_mock),
+        patch("src.main.middlewares.auth.settings.JWT_SECRET", jwt_secret),
+        patch(
+            "src.main.middlewares.auth.jwt.decode", return_value=payload
+        ) as decode_mock,
+    ):
         assert callable(auth_middleware)
         wrapper = auth_middleware(scope, id_key)
         assert callable(wrapper)

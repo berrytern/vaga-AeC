@@ -1,12 +1,25 @@
 repos:
--   repo: https://github.com/psf/black
-    rev: 22.6.0
+-   repo: local
     hooks:
-    - id: black
-      language_version: python3.10
-      stages: [pre-commit]
--   repo: https://github.com/PyCQA/flake8
-    rev: 3.9.2
+      - id: lint
+        name: ruff check fix
+        entry: bash -c 'uvx ruff check --fix'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+-   repo: local
     hooks:
-    - id: flake8
-      stages: [pre-commit]
+      - id: lint
+        name: ruff format
+        entry: bash -c 'uvx ruff format'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+-   repo: local
+    hooks:
+      - id: type-check
+        name: ty
+        entry: bash -c 'uvx ty check src'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

@@ -2,9 +2,7 @@ from typing import cast, Type, Optional, List, Dict, Any
 from src.application.domain.models import ReaderModel, ReaderList
 from src.application.port import ReaderInterface
 from src.infrastructure.database.schemas import ReaderSchema
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-)
+from src.utils.default import get_db_session
 from sqlalchemy import select, delete
 from json import loads
 from datetime import datetime
@@ -14,17 +12,16 @@ from uuid import UUID
 class ReaderRepository:
     def __init__(
         self,
-        session: AsyncSession,
         schema: Type[ReaderSchema],
         model: Type[ReaderModel],
         list_model: Type[ReaderList],
     ):
-        self.session = session  # Database session
         self.schema = schema
         self.model = model
         self.list_model = list_model
 
     async def create(self, data: Dict[str, Any]) -> Optional[ReaderInterface]:
+        session = get_db_session()
         insert_stmt = (
             self.schema.__table__.insert()
             .returning(
@@ -37,7 +34,7 @@ class ReaderRepository:
             )
             .values(**data)
         )
-        result = (await self.session.execute(insert_stmt)).fetchone()
+        result = (await session.execute(insert_stmt)).fetchone()
         return loads(
             self.model(
                 id=result[0],
@@ -50,13 +47,14 @@ class ReaderRepository:
         )
 
     async def get_one(self, fields: Dict[str, Any]) -> Optional[ReaderInterface]:
+        session = get_db_session()
         get_one_stmt = select(self.schema)
         for key, value in fields.items():
             get_one_stmt = get_one_stmt.where(
                 self.schema.__getattribute__(self.schema, key) == value
             )
         get_one_stmt = get_one_stmt.limit(1)
-        result = (await self.session.execute(get_one_stmt)).fetchone()
+        result = (await session.execute(get_one_stmt)).fetchone()
         if result is not None:
             item: ReaderSchema = result[0]
             reader: ReaderInterface = loads(
@@ -74,8 +72,9 @@ class ReaderRepository:
             return result
 
     async def get_all(self, filters: Dict[str, Any]) -> List[ReaderInterface]:
+        session = get_db_session()
         stmt = select(self.schema).filter_by(**filters["query"]).limit(filters["limit"])
-        stream = await self.session.stream_scalars(stmt.order_by(self.schema.id))
+        stream = await session.stream_scalars(stmt.order_by(self.schema.id))
         return loads(
             self.list_model(root=[item async for item in stream]).model_dump_json()
         )
@@ -83,6 +82,7 @@ class ReaderRepository:
     async def update_one(
         self, id: str, data: Dict[str, Any]
     ) -> Optional[ReaderInterface]:
+        session = get_db_session()
         update_stmt = (
             self.schema.__table__.update()
             .returning(
@@ -96,7 +96,7 @@ class ReaderRepository:
             .where(self.schema.id == id)
             .values(**data)
         )
-        result = (await self.session.execute(update_stmt)).fetchone()
+        result = (await session.execute(update_stmt)).fetchone()
         if result:
             result = loads(
                 self.model(
@@ -113,6 +113,7 @@ class ReaderRepository:
     async def update_books_read_count(
         self, id: str, count: int
     ) -> Optional[ReaderInterface]:
+        session = get_db_session()
         update_stmt = (
             self.schema.__table__.update()
             .returning(
@@ -126,7 +127,7 @@ class ReaderRepository:
             .where(self.schema.id == id)
             .values(books_read_count=self.schema.books_read_count + count)
         )
-        result = (await self.session.execute(update_stmt)).fetchone()
+        result = (await session.execute(update_stmt)).fetchone()
         if result:
             result = loads(
                 self.model(
@@ -141,4 +142,5 @@ class ReaderRepository:
         return result
 
     async def delete_one(self, id: str) -> None:
-        await self.session.execute(delete(self.schema).where(self.schema.id == id))
+        session = get_db_session()
+        await session.execute(delete(self.schema).where(self.schema.id == id))
