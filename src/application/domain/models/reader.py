@@ -10,7 +10,7 @@ from pydantic import (
     StrictStr,
 )
 from uuid import UUID
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 
 class CreateReaderModel(CreateAuthModel):
@@ -21,10 +21,6 @@ class CreateReaderModel(CreateAuthModel):
         populate_by_name=True,
         arbitrary_types_allowed=True,
         from_attributes=True,
-        json_encoders={
-            date: lambda dt: dt.strftime("%Y-%m-%d"),
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
-        },
     )
 
 
@@ -36,10 +32,6 @@ class UpdateReaderModel(BaseModel):
         populate_by_name=True,
         arbitrary_types_allowed=True,
         from_attributes=True,
-        json_encoders={
-            date: lambda dt: dt.strftime("%Y-%m-%d"),
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
-        },
     )
 
 
@@ -49,25 +41,33 @@ class ReaderModel(BaseModel):
     birthday: Optional[date] = None
     books_read_count: Optional[int] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
+        default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0)
     )
     updated_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
+        default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0)
     )
 
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         from_attributes=True,
-        json_encoders={
-            date: lambda dt: dt.strftime("%Y-%m-%d"),
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z",
-        },
     )
 
     @field_serializer("id")
     def serialize_id(self, id):
         return str(id)
+
+    @field_serializer("birthday")
+    def serialize_date(self, dt: Optional[date]) -> Optional[str]:
+        if dt is None:
+            return None
+        return dt.strftime("%Y-%m-%d")
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_datetimes(self, dt: Optional[datetime]) -> Optional[str]:
+        if dt is None:
+            return None
+        return dt.replace(microsecond=0).isoformat() + "Z"
 
 
 class ReaderList(RootModel):

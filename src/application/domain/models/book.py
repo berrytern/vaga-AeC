@@ -10,7 +10,7 @@ from pydantic import (
     StrictFloat,
 )
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class CreateBookModel(BaseModel):
@@ -40,24 +40,25 @@ class BookModel(BaseModel):
     author: Optional[StrictStr] = Field(None, max_length=60)
     price: Optional[StrictFloat] = Field(None, ge=0)
     created_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
+        default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0)
     )
     updated_at: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
+        default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0)
     )
 
     model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
-        },
+        populate_by_name=True, arbitrary_types_allowed=True, from_attributes=True
     )
 
     @field_serializer("id", check_fields=False)
     def serialize_id(self, id):
         return str(id)
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_datetimes(self, dt: Optional[datetime]) -> Optional[str]:
+        if dt is None:
+            return None
+        return dt.replace(microsecond=0).isoformat() + "Z"
 
 
 class BookList(RootModel):

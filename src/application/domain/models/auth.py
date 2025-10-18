@@ -6,7 +6,7 @@ from pydantic import (
     EmailStr,
 )
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class AuthModel(BaseModel):
@@ -17,6 +17,6 @@ class AuthModel(BaseModel):
     password: Optional[StrictStr] = None
     refresh_token: Optional[StrictStr] = None
     last_login: Optional[datetime] = Field(
-        default_factory=lambda: datetime.now().replace(microsecond=0)
+        default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0)
     )
     foreign_id: Optional[UUID] = None

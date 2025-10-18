@@ -1,5 +1,5 @@
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 EXP_TIME_IN_SECONDS = 10000
 
@@ -9,9 +9,9 @@ ADMIN_PAYLOAD = {
     "sub": f"{uuid4()}",
     "iss": "berrytern",
     "type": "admin",
-    "iat": datetime.utcnow(),
+    "iat": datetime.now(timezone.utc),
     "scope": ADMIN_SCOPE,
-    "exp": datetime.utcnow() + timedelta(seconds=EXP_TIME_IN_SECONDS),
+    "exp": datetime.now(timezone.utc) + timedelta(seconds=EXP_TIME_IN_SECONDS),
 }
 
 EXP_TIME_IN_SECONDS = 10000
@@ -22,7 +22,7 @@ READER_PAYLOAD = {
     "sub": f"{uuid4()}",
     "iss": "berrytern",
     "type": "reader",
-    "iat": datetime.utcnow(),
+    "iat": datetime.now(timezone.utc),
     "scope": READER_SCOPE,
-    "exp": datetime.utcnow() + timedelta(seconds=EXP_TIME_IN_SECONDS),
+    "exp": datetime.now(timezone.utc) + timedelta(seconds=EXP_TIME_IN_SECONDS),
 }

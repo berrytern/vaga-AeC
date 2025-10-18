@@ -17,7 +17,7 @@ from src.presenters.exceptions import (
 )
 from src.utils import settings, default
 from http import HTTPStatus
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from email.mime.text import MIMEText
 import bcrypt
@@ -47,7 +47,7 @@ class AuthService:
             raise UnauthorizedException(
                 HTTPStatus.UNAUTHORIZED.phrase, HTTPStatus.UNAUTHORIZED.description
             )
-        current = datetime.utcnow()
+        current = datetime.now(timezone.utc)
         payload = {
             "sub": str(result["foreign_id"]),
             "iss": settings.ISSUER,
@@ -71,7 +71,7 @@ class AuthService:
             str(result["id"]),
             {
                 "refresh_token": response["refresh_token"],
-                "last_login": datetime.now(),
+                "last_login": datetime.now(timezone.utc),
             },
         )
         return response

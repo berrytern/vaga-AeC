@@ -5,6 +5,7 @@ from pydantic import (
     BaseModel,
     RootModel,
     ConfigDict,
+    field_serializer,
 )
 from uuid import UUID
 
@@ -22,13 +23,14 @@ class FavoriteModel(BaseModel):
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda dt: dt.replace(microsecond=0).isoformat() + "Z"
-        },
+        populate_by_name=True, arbitrary_types_allowed=True, from_attributes=True
     )
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_datetimes(self, dt: Optional[datetime]) -> Optional[str]:
+        if dt is None:
+            return None
+        return dt.replace(microsecond=0).isoformat() + "Z"
 
 
 class FavoriteQueryModel(QueryModel):
