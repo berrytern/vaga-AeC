@@ -13,7 +13,7 @@ class AuthSchema(Base):
     user_type = Column(String(30), nullable=False)
     password = Column(String)
     refresh_token = Column(String, nullable=True)
-    last_login = Column(DateTime, nullable=True)
+    last_login = Column(DateTime(timezone=True), nullable=True)
     foreign_id = Column(UUID, nullable=True)
 
     def __repr__(self) -> str:
