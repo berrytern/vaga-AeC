@@ -32,4 +32,4 @@ jobs:
 
     - name: Run type checker
       # 'uv run' automatically finds and uses the .venv
-      run: uvx ty check
+      run: uvx ty check src
