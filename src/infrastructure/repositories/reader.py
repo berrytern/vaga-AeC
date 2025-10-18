@@ -2,7 +2,7 @@ from typing import cast, Type, Optional, Tuple, List, Dict, Any
 from src.application.domain.models import ReaderModel, ReaderList
 from src.application.port import ReaderInterface
 from src.infrastructure.database.schemas import ReaderSchema
-from src.utils.default import get_db_session, get_aux_db_session, aux_db_session_var
+from src.utils.default import get_db_session, get_aux_db_session
 from sqlalchemy import select, insert, update, delete, func
 from asyncio import gather
 from json import loads
@@ -76,7 +76,7 @@ class ReaderRepository:
         self, filters: Dict[str, Any]
     ) -> Tuple[List[ReaderInterface], int]:
         session = get_db_session()
-        token, count_session = get_aux_db_session()
+        _, count_session = get_aux_db_session()
         stmt = select(self.schema).filter_by(**filters["query"])
         search_conditions = []
         for key, value in filters["like"].items():
@@ -96,9 +96,6 @@ class ReaderRepository:
             ),
         )
         total_count = total_count.scalar_one()
-        if token is not None:
-            aux_db_session_var.reset(token)
-            await count_session.aclose()
 
         return loads(
             self.list_model(root=[item async for item in stream]).model_dump_json()

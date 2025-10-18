@@ -1,7 +1,7 @@
 from fastapi import Request
 from typing import Callable
 from functools import wraps
-from src.utils.default import get_or_set_db_session, db_session_var
+from src.utils.default import get_or_set_db_session, db_session_var, aux_db_session_var
 
 
 # injects a database session into the request state
@@ -49,5 +49,7 @@ def session_middleware(next: Callable):
                 await db.close()
                 if token:
                     db_session_var.reset(token)
+                if aux_session := aux_db_session_var.get(None):
+                    await aux_session.aclose()
 
     return wrapper
