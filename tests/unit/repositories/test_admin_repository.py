@@ -69,24 +69,40 @@ async def test_get_one_admin(admin_repository, session_mock):
 
 
 @pytest.mark.asyncio
-async def test_get_all_admins(admin_repository, session_mock):
+async def test_get_all_admins(admin_repository, session_mock, aux_session_mock):
     # Prepare test data
-    filters = {"query": {}, "limit": 10}
+    filters = {
+        "query": {},
+        "like": {},
+        "limit": 10,
+        "sort": "created_at",
+        "sort_direction": 1,
+        "page": 1,
+    }
 
     # Mock the stream_scalars result
     mock_schema = MagicMock()
+    total_count_mock_schema = MagicMock()
     for key, value in ADMIN_DATA.items():
         setattr(mock_schema, key, value)
+
+    total_count_mock_schema.scalar_one.return_value = 1
 
     async def mock_stream():
         yield mock_schema
 
+    def total_count_mock():
+        return total_count_mock_schema
+
     session_mock.stream_scalars.return_value = mock_stream()
 
+    aux_session_mock.execute.return_value = total_count_mock()
+
     # Execute the method
-    result = await admin_repository.get_all(filters)
+    result, total_count = await admin_repository.get_all(filters)
 
     # Assertions
+    assert isinstance(total_count, int)
     assert isinstance(result, list)
     assert len(result) == 1
     assert result[0]["id"] == str(ADMIN_DATA["id"])

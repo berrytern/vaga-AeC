@@ -15,7 +15,7 @@ from src.infrastructure.database.schemas import (
     ReaderSchema,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.utils.default import db_session_var
+from src.utils.default import db_session_var, aux_db_session_var
 
 
 @pytest.fixture
@@ -24,6 +24,14 @@ def session_mock():
     token = db_session_var.set(session)
     yield session
     db_session_var.reset(token)
+
+
+@pytest.fixture
+def aux_session_mock():
+    session = AsyncMock(spec=AsyncSession)
+    token = aux_db_session_var.set(session)
+    yield session
+    aux_db_session_var.reset(token)
 
 
 @pytest.fixture
