@@ -7,7 +7,7 @@ from src.application.domain.models import (
     ReaderQueryModel,
     ReaderList,
 )
-from src.di import DI
+from src.di import DI_CONTAINER
 from src.main.middlewares import (
     auth_middleware,
     cache_middleware,
@@ -31,7 +31,7 @@ router_cors = CORSMiddleware(READER_ROUTER, "*")
 @auth_middleware("rd:c")
 @session_middleware
 async def create_new_reader(request: Request, reader: CreateReaderModel):
-    response = await DI.reader_controller().create(reader)
+    response = await DI_CONTAINER.controllers.reader_controller().create(reader)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -50,7 +50,7 @@ async def get_all_readers(request: Request):
     query_params = dict(request.query_params)
     query = ReaderQueryModel(**query_params).query_dict()
 
-    response = await DI.reader_controller().get_all(query)
+    response = await DI_CONTAINER.controllers.reader_controller().get_all(query)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -66,7 +66,7 @@ async def get_all_readers(request: Request):
 @cache_middleware(5)
 @session_middleware
 async def get_one_reader(request: Request, reader_id: UUID):
-    response = await DI.reader_controller().get_one(reader_id)
+    response = await DI_CONTAINER.controllers.reader_controller().get_one(reader_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -83,7 +83,9 @@ async def get_one_reader(request: Request, reader_id: UUID):
 async def update_reader_info(
     request: Request, reader_id: UUID, reader: UpdateReaderModel
 ):
-    response = await DI.reader_controller().update_one(reader_id, reader)
+    response = await DI_CONTAINER.controllers.reader_controller().update_one(
+        reader_id, reader
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -98,7 +100,7 @@ async def update_reader_info(
 @auth_middleware("rd:d", "reader_id")
 @session_middleware
 async def delete_reader_info(request: Request, reader_id: UUID):
-    response = await DI.reader_controller().delete_one(reader_id)
+    response = await DI_CONTAINER.controllers.reader_controller().delete_one(reader_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

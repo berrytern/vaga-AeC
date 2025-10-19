@@ -7,7 +7,7 @@ from src.application.domain.models import (
     BookQueryModel,
     BookList,
 )
-from src.di import DI
+from src.di import DI_CONTAINER
 from src.main.middlewares import (
     auth_middleware,
     cache_middleware,
@@ -31,7 +31,7 @@ router_cors = CORSMiddleware(BOOK_ROUTER, "*")
 @auth_middleware("bk:c")
 @session_middleware
 async def create_new_book(request: Request, book: CreateBookModel):
-    response = await DI.book_controller().create(book)
+    response = await DI_CONTAINER.controllers.book_controller().create(book)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -50,7 +50,7 @@ async def get_all_books(request: Request):
     query_params = dict(request.query_params)
     query = BookQueryModel(**query_params).query_dict()
 
-    response = await DI.book_controller().get_all(query)
+    response = await DI_CONTAINER.controllers.book_controller().get_all(query)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -66,7 +66,7 @@ async def get_all_books(request: Request):
 @cache_middleware(5)
 @session_middleware
 async def get_one_book(request: Request, book_id: UUID):
-    response = await DI.book_controller().get_one(book_id)
+    response = await DI_CONTAINER.controllers.book_controller().get_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -81,7 +81,9 @@ async def get_one_book(request: Request, book_id: UUID):
 @auth_middleware("bk:u")
 @session_middleware
 async def update_book_info(request: Request, book_id: UUID, book: UpdateBookModel):
-    response = await DI.book_controller().update_one(book_id, book)
+    response = await DI_CONTAINER.controllers.book_controller().update_one(
+        book_id, book
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -96,7 +98,7 @@ async def update_book_info(request: Request, book_id: UUID, book: UpdateBookMode
 @auth_middleware("bk:d")
 @session_middleware
 async def delete_book_info(request: Request, book_id: UUID):
-    response = await DI.book_controller().delete_one(book_id)
+    response = await DI_CONTAINER.controllers.book_controller().delete_one(book_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

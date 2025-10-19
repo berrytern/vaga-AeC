@@ -27,6 +27,7 @@ dependencies = [
     "redis[asyncio] >= 5.2.1",
     "aiosmtplib >= 3.0.2",
     "jinja2 >= 3.1.5",
+    "dependency-injector>=4.48.2",
 ]
 
 [dependency-groups]

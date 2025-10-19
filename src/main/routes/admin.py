@@ -7,10 +7,6 @@ from src.application.domain.models import (
     AdminQueryModel,
     AdminList,
 )
-from src.application.services import AdminService
-from src.infrastructure.database.schemas import AdminSchema
-from src.infrastructure.repositories import AdminRepository, AuthRepository
-from src.presenters.controllers import AdminController
 from src.main.middlewares import (
     auth_middleware,
     cache_middleware,
@@ -18,6 +14,7 @@ from src.main.middlewares import (
     rate_limit_middleware,
     session_middleware,
 )
+from src.di import DI_CONTAINER
 from uuid import UUID
 
 ADMIN_ROUTER = APIRouter()
@@ -34,10 +31,7 @@ router_cors = CORSMiddleware(ADMIN_ROUTER, "*")
 @auth_middleware("ad:c")
 @session_middleware
 async def create_new_admin(request: Request, admin: CreateAdminModel):
-    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
-    auth_repository = AuthRepository()
-    service = AdminService(repository, auth_repository)
-    response = await AdminController(service).create(admin)
+    response = await DI_CONTAINER.controllers.admin_controller().create(admin)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -56,10 +50,7 @@ async def get_all_admins(request: Request):
     query_params = dict(request.query_params)
     query = AdminQueryModel(**query_params).query_dict()
 
-    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
-    auth_repository = AuthRepository()
-    service = AdminService(repository, auth_repository)
-    response = await AdminController(service).get_all(query)
+    response = await DI_CONTAINER.controllers.admin_controller().get_all(query)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -75,10 +66,7 @@ async def get_all_admins(request: Request):
 @cache_middleware(5)
 @session_middleware
 async def get_one_admin(request: Request, admin_id: UUID):
-    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
-    auth_repository = AuthRepository()
-    service = AdminService(repository, auth_repository)
-    response = await AdminController(service).get_one(admin_id)
+    response = await DI_CONTAINER.controllers.admin_controller().get_one(admin_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -93,10 +81,9 @@ async def get_one_admin(request: Request, admin_id: UUID):
 @auth_middleware("ad:u")
 @session_middleware
 async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdminModel):
-    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
-    auth_repository = AuthRepository()
-    service = AdminService(repository, auth_repository)
-    response = await AdminController(service).update_one(admin_id, admin)
+    response = await DI_CONTAINER.controllers.admin_controller().update_one(
+        admin_id, admin
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -111,10 +98,7 @@ async def update_admin_info(request: Request, admin_id: UUID, admin: UpdateAdmin
 @auth_middleware("ad:d")
 @session_middleware
 async def delete_admin_info(request: Request, admin_id: UUID):
-    repository = AdminRepository(AdminSchema, AdminModel, AdminList)
-    auth_repository = AuthRepository()
-    service = AdminService(repository, auth_repository)
-    response = await AdminController(service).delete_one(admin_id)
+    response = await DI_CONTAINER.controllers.admin_controller().delete_one(admin_id)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )

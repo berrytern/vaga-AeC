@@ -7,7 +7,7 @@ from src.application.domain.models import (
     RecoverPasswordModel,
 )
 from src.application.services import AuthService
-from src.di import DI
+from src.di import DI_CONTAINER
 from src.infrastructure.cache import RedisClient
 from src.main.middlewares import (
     auth_middleware,
@@ -38,7 +38,7 @@ templates = Jinja2Templates(directory="templates")
 @rate_limit_middleware(5, 5 * 60)
 @session_middleware
 async def login(request: Request, data: CredentialModel):
-    response = await DI.auth_controller().login(data)
+    response = await DI_CONTAINER.controllers.auth_controller().login(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -53,7 +53,7 @@ async def login(request: Request, data: CredentialModel):
 @auth_middleware(None)
 @session_middleware
 async def refresh_token(request: Request, data: RefreshCredentialModel):
-    response = await DI.auth_controller().refresh_token(data)
+    response = await DI_CONTAINER.controllers.auth_controller().refresh_token(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -85,7 +85,9 @@ async def revoke_token(data: RevokeCredentialModel):
 @auth_middleware(None, "user_id")
 @rate_limit_middleware(2, 5 * 60)
 async def change_password(request: Request, data: ResetCredentialModel, user_id: UUID):
-    response = await DI.auth_controller().change_password(data, user_id)
+    response = await DI_CONTAINER.controllers.auth_controller().change_password(
+        data, user_id
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -99,7 +101,9 @@ async def change_password(request: Request, data: ResetCredentialModel, user_id:
 @rate_limit_middleware(1, 10 * 60)
 @session_middleware
 async def request_password_reset(request: Request, data: RecoverRequestModel):
-    response = await DI.auth_controller().request_password_reset(data)
+    response = await DI_CONTAINER.controllers.auth_controller().request_password_reset(
+        data
+    )
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
@@ -109,7 +113,7 @@ async def request_password_reset(request: Request, data: RecoverRequestModel):
 @rate_limit_middleware(1, 60)
 @session_middleware
 async def reset_password(request: Request, data: RecoverPasswordModel):
-    response = await DI.auth_controller().reset_password(data)
+    response = await DI_CONTAINER.controllers.auth_controller().reset_password(data)
     return JSONResponse(
         content=response[0], status_code=response[1], headers=response[2]
     )
